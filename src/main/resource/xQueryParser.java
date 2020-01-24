@@ -1,10 +1,11 @@
 // Generated from /Users/suen/Desktop/CSE232B/CSE232B-Database/src/resource/xQuery.g4 by ANTLR 4.8
-package resource;
+package main.resource;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.*;
 import org.antlr.v4.runtime.tree.*;
+
 import java.util.List;
 import java.util.Iterator;
 import java.util.ArrayList;
@@ -123,7 +124,7 @@ public class xQueryParser extends Parser {
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof xQueryVisitor ) return ((xQueryVisitor<? extends T>)visitor).visitAllDescendent(this);
+			if ( visitor instanceof xQueryVisitor) return ((xQueryVisitor<? extends T>)visitor).visitAllDescendent(this);
 			else return visitor.visitChildren(this);
 		}
 	}

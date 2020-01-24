@@ -1,6 +1,7 @@
 // Generated from /Users/suen/Desktop/CSE232B/CSE232B-Database/src/resource/xQuery.g4 by ANTLR 4.8
-package resource;
+package main.resource;
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
+
 
 /**
  * This class provides an empty implementation of {@link xQueryVisitor},
