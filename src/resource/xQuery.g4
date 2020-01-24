@@ -1,13 +1,13 @@
 
 /* XPath.g4
- *
+ * https://en.wikipedia.org/wiki/XPath
  */
 
 grammar xQuery;
 
 ap
-	: 'doc("' filename '")' '/' rp          # Descendent
-	| 'doc("' filename '")' '//' rp         # AllDescendent
+	: 'doc("' filename '")' '/' rp          # ADescendent
+	| 'doc("' filename '")' '//' rp         # ADesOrSelf
 	;
 
 filename
@@ -17,27 +17,27 @@ filename
 rp
 	: NAME                         # TagName
 	| '*'                          # Children
-	| '.'                          # Current
+	| '.'                          # Self
 	| '..'                         # Parent
-	| 'text()'                     # Txt
+	| 'text()'                     # Text
 	| '@' NAME                     # Attribute
-	| '(' rp ')'                   # RRn
+	| '(' rp ')'                   # RBracket
 	| rp '/' rp                    # RDescendent
-	| rp '//' rp                   # RAll
+	| rp '//' rp                   # RDesOrSelf
 	| rp '[' filter ']'            # RFilter
-	| rp ',' rp                    # Concatenation
+	| rp ',' rp                    # RConcat
 	;
 
 filter
-	: rp                           # CheckNotEmpty
-	| rp '=' rp                    # Equal
-	| rp 'eq' rp                   # AlsoEqual
-	| rp '==' rp                   # Is
-	| rp 'is' rp                   # AlsoIs
-	| '(' filter ')'               # FFn
-	| filter 'and' filter          # And
-	| filter 'or' filter           # Or
-	| 'not' filter                 # Not
+	: rp                           # FRp
+	| rp '=' rp                    # FEqual
+	| rp 'eq' rp                   # FEqual
+	| rp '==' rp                   # FIs
+	| rp 'is' rp                   # FIs
+	| '(' filter ')'               # FBracket
+	| filter 'and' filter          # FAnd
+	| filter 'or' filter           # FOr
+	| 'not' filter                 # FNot
 	;
 
 NAME: [a-zA-Z0-9_-]+;

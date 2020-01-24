@@ -1,4 +1,4 @@
-// Generated from /Users/suen/Desktop/CSE232B/CSE232B-Database/src/resource/xQuery.g4 by ANTLR 4.8
+// Generated from /Users/vivian/CSE232B-Database/src/resource/xQuery.g4 by ANTLR 4.8
 package resource;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
@@ -11,39 +11,25 @@ import org.antlr.v4.runtime.tree.ParseTreeVisitor;
  */
 public interface xQueryVisitor<T> extends ParseTreeVisitor<T> {
 	/**
-	 * Visit a parse tree produced by the {@code Descendent}
+	 * Visit a parse tree produced by the {@code ADescendent}
 	 * labeled alternative in {@link xQueryParser#ap}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitDescendent(xQueryParser.DescendentContext ctx);
+	T visitADescendent(xQueryParser.ADescendentContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code AllDescendent}
+	 * Visit a parse tree produced by the {@code ADesOrSelf}
 	 * labeled alternative in {@link xQueryParser#ap}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitAllDescendent(xQueryParser.AllDescendentContext ctx);
+	T visitADesOrSelf(xQueryParser.ADesOrSelfContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link xQueryParser#filename}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitFilename(xQueryParser.FilenameContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code Txt}
-	 * labeled alternative in {@link xQueryParser#rp}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitTxt(xQueryParser.TxtContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code Concatenation}
-	 * labeled alternative in {@link xQueryParser#rp}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitConcatenation(xQueryParser.ConcatenationContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code TagName}
 	 * labeled alternative in {@link xQueryParser#rp}.
@@ -66,6 +52,13 @@ public interface xQueryVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitAttribute(xQueryParser.AttributeContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code RConcat}
+	 * labeled alternative in {@link xQueryParser#rp}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitRConcat(xQueryParser.RConcatContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code RFilter}
 	 * labeled alternative in {@link xQueryParser#rp}.
 	 * @param ctx the parse tree
@@ -73,12 +66,12 @@ public interface xQueryVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitRFilter(xQueryParser.RFilterContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code RAll}
+	 * Visit a parse tree produced by the {@code Text}
 	 * labeled alternative in {@link xQueryParser#rp}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitRAll(xQueryParser.RAllContext ctx);
+	T visitText(xQueryParser.TextContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code RDescendent}
 	 * labeled alternative in {@link xQueryParser#rp}.
@@ -94,80 +87,73 @@ public interface xQueryVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitChildren(xQueryParser.ChildrenContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code Current}
+	 * Visit a parse tree produced by the {@code Self}
 	 * labeled alternative in {@link xQueryParser#rp}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitCurrent(xQueryParser.CurrentContext ctx);
+	T visitSelf(xQueryParser.SelfContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code RRn}
+	 * Visit a parse tree produced by the {@code RDesOrSelf}
 	 * labeled alternative in {@link xQueryParser#rp}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitRRn(xQueryParser.RRnContext ctx);
+	T visitRDesOrSelf(xQueryParser.RDesOrSelfContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code CheckNotEmpty}
+	 * Visit a parse tree produced by the {@code RBracket}
+	 * labeled alternative in {@link xQueryParser#rp}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitRBracket(xQueryParser.RBracketContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code FIs}
 	 * labeled alternative in {@link xQueryParser#filter}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitCheckNotEmpty(xQueryParser.CheckNotEmptyContext ctx);
+	T visitFIs(xQueryParser.FIsContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code Not}
+	 * Visit a parse tree produced by the {@code FAnd}
 	 * labeled alternative in {@link xQueryParser#filter}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitNot(xQueryParser.NotContext ctx);
+	T visitFAnd(xQueryParser.FAndContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code AlsoIs}
+	 * Visit a parse tree produced by the {@code FRp}
 	 * labeled alternative in {@link xQueryParser#filter}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitAlsoIs(xQueryParser.AlsoIsContext ctx);
+	T visitFRp(xQueryParser.FRpContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code Or}
+	 * Visit a parse tree produced by the {@code FOr}
 	 * labeled alternative in {@link xQueryParser#filter}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitOr(xQueryParser.OrContext ctx);
+	T visitFOr(xQueryParser.FOrContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code Equal}
+	 * Visit a parse tree produced by the {@code FBracket}
 	 * labeled alternative in {@link xQueryParser#filter}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitEqual(xQueryParser.EqualContext ctx);
+	T visitFBracket(xQueryParser.FBracketContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code And}
+	 * Visit a parse tree produced by the {@code FEqual}
 	 * labeled alternative in {@link xQueryParser#filter}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitAnd(xQueryParser.AndContext ctx);
+	T visitFEqual(xQueryParser.FEqualContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code AlsoEqual}
+	 * Visit a parse tree produced by the {@code FNot}
 	 * labeled alternative in {@link xQueryParser#filter}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitAlsoEqual(xQueryParser.AlsoEqualContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code Is}
-	 * labeled alternative in {@link xQueryParser#filter}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitIs(xQueryParser.IsContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code FFn}
-	 * labeled alternative in {@link xQueryParser#filter}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitFFn(xQueryParser.FFnContext ctx);
+	T visitFNot(xQueryParser.FNotContext ctx);
 }

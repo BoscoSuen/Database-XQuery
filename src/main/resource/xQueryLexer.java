@@ -1,4 +1,4 @@
-// Generated from /Users/suen/Desktop/CSE232B/CSE232B-Database/src/resource/xQuery.g4 by ANTLR 4.8
+// Generated from /Users/vivian/CSE232B-Database/src/resource/xQuery.g4 by ANTLR 4.8
 package resource;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;

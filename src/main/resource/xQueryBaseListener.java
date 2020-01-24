@@ -1,4 +1,4 @@
-// Generated from /Users/suen/Desktop/CSE232B/CSE232B-Database/src/resource/xQuery.g4 by ANTLR 4.8
+// Generated from /Users/vivian/CSE232B-Database/src/resource/xQuery.g4 by ANTLR 4.8
 package resource;
 
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -16,25 +16,25 @@ public class xQueryBaseListener implements xQueryListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterDescendent(xQueryParser.DescendentContext ctx) { }
+	@Override public void enterADescendent(xQueryParser.ADescendentContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitDescendent(xQueryParser.DescendentContext ctx) { }
+	@Override public void exitADescendent(xQueryParser.ADescendentContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterAllDescendent(xQueryParser.AllDescendentContext ctx) { }
+	@Override public void enterADesOrSelf(xQueryParser.ADesOrSelfContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitAllDescendent(xQueryParser.AllDescendentContext ctx) { }
+	@Override public void exitADesOrSelf(xQueryParser.ADesOrSelfContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -47,30 +47,6 @@ public class xQueryBaseListener implements xQueryListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitFilename(xQueryParser.FilenameContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterTxt(xQueryParser.TxtContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitTxt(xQueryParser.TxtContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterConcatenation(xQueryParser.ConcatenationContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitConcatenation(xQueryParser.ConcatenationContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -112,6 +88,18 @@ public class xQueryBaseListener implements xQueryListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterRConcat(xQueryParser.RConcatContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitRConcat(xQueryParser.RConcatContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterRFilter(xQueryParser.RFilterContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -124,13 +112,13 @@ public class xQueryBaseListener implements xQueryListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterRAll(xQueryParser.RAllContext ctx) { }
+	@Override public void enterText(xQueryParser.TextContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitRAll(xQueryParser.RAllContext ctx) { }
+	@Override public void exitText(xQueryParser.TextContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -160,133 +148,121 @@ public class xQueryBaseListener implements xQueryListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterCurrent(xQueryParser.CurrentContext ctx) { }
+	@Override public void enterSelf(xQueryParser.SelfContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitCurrent(xQueryParser.CurrentContext ctx) { }
+	@Override public void exitSelf(xQueryParser.SelfContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterRRn(xQueryParser.RRnContext ctx) { }
+	@Override public void enterRDesOrSelf(xQueryParser.RDesOrSelfContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitRRn(xQueryParser.RRnContext ctx) { }
+	@Override public void exitRDesOrSelf(xQueryParser.RDesOrSelfContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterCheckNotEmpty(xQueryParser.CheckNotEmptyContext ctx) { }
+	@Override public void enterRBracket(xQueryParser.RBracketContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitCheckNotEmpty(xQueryParser.CheckNotEmptyContext ctx) { }
+	@Override public void exitRBracket(xQueryParser.RBracketContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterNot(xQueryParser.NotContext ctx) { }
+	@Override public void enterFIs(xQueryParser.FIsContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitNot(xQueryParser.NotContext ctx) { }
+	@Override public void exitFIs(xQueryParser.FIsContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterAlsoIs(xQueryParser.AlsoIsContext ctx) { }
+	@Override public void enterFAnd(xQueryParser.FAndContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitAlsoIs(xQueryParser.AlsoIsContext ctx) { }
+	@Override public void exitFAnd(xQueryParser.FAndContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterOr(xQueryParser.OrContext ctx) { }
+	@Override public void enterFRp(xQueryParser.FRpContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitOr(xQueryParser.OrContext ctx) { }
+	@Override public void exitFRp(xQueryParser.FRpContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterEqual(xQueryParser.EqualContext ctx) { }
+	@Override public void enterFOr(xQueryParser.FOrContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitEqual(xQueryParser.EqualContext ctx) { }
+	@Override public void exitFOr(xQueryParser.FOrContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterAnd(xQueryParser.AndContext ctx) { }
+	@Override public void enterFBracket(xQueryParser.FBracketContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitAnd(xQueryParser.AndContext ctx) { }
+	@Override public void exitFBracket(xQueryParser.FBracketContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterAlsoEqual(xQueryParser.AlsoEqualContext ctx) { }
+	@Override public void enterFEqual(xQueryParser.FEqualContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitAlsoEqual(xQueryParser.AlsoEqualContext ctx) { }
+	@Override public void exitFEqual(xQueryParser.FEqualContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterIs(xQueryParser.IsContext ctx) { }
+	@Override public void enterFNot(xQueryParser.FNotContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitIs(xQueryParser.IsContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterFFn(xQueryParser.FFnContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitFFn(xQueryParser.FFnContext ctx) { }
+	@Override public void exitFNot(xQueryParser.FNotContext ctx) { }
 
 	/**
 	 * {@inheritDoc}
