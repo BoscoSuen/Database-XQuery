@@ -13,7 +13,7 @@ import java.io.IOException;
 public class XPath {
 
     public static void main(String[] args) throws IOException {
-        CharStream charStream = CharStreams.fromFileName("./src/data/test.txt");
+        CharStream charStream = CharStreams.fromFileName("src/data/test.txt");
         xQueryLexer xQueryLexer = new xQueryLexer(charStream);
         CommonTokenStream commonTokenStream = new CommonTokenStream(xQueryLexer);
         xQueryParser xQueryParser = new xQueryParser(commonTokenStream);
