@@ -7,8 +7,10 @@ import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.w3c.dom.Node;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class XPath {
 
@@ -20,8 +22,10 @@ public class XPath {
 
         ParseTree parseTree = xQueryParser.ap();
         xQueryMyVisitor visitor = new xQueryMyVisitor();
-        visitor.visit(parseTree);
+        ArrayList<Node> list = (ArrayList<Node>) visitor.visit(parseTree);
         // can add a break point at the println to see the elements in the parseTree
-        System.out.println("test end here");
+        for (Node n : list) {
+            System.out.println(n.getNodeName());
+        }
     }
 }
