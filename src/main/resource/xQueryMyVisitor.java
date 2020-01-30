@@ -1,6 +1,7 @@
 package main.resource;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -23,7 +24,6 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
     // ap: 'doc("' filename '")' '/' rp
     public ArrayList<Node> visitADescendent(xQueryParser.ADescendentContext ctx) {
         Node root = getRoot(ctx.filename().getText());
-        System.out.println(root);
         return (ArrayList<Node>) visitChildren(ctx);
     }
 
@@ -78,12 +78,20 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitAttribute(xQueryParser.AttributeContext ctx) {
-        return visitChildren(ctx);
+    // rp: '@' NAME
+    public ArrayList<Node> visitAttribute(xQueryParser.AttributeContext ctx) {
+        ArrayList<Node> res = new ArrayList<>();
+        String name = ctx.NAME().getText();
+        for (Node n : list) {
+            if (!((Element)n).getAttribute(name).isEmpty()) {
+                res.add(n);
+            }
+        }
+        list = res;
+        return res;
     }
 
     @Override
-    // rp: rp ',' rp
     public Object visitRConcat(xQueryParser.RConcatContext ctx) {
         return visitChildren(ctx);
     }
@@ -121,8 +129,9 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitSelf(xQueryParser.SelfContext ctx) {
-        return visitChildren(ctx);
+    // rp : '.'
+    public ArrayList<Node> visitSelf(xQueryParser.SelfContext ctx) {
+        return list;
     }
 
     @Override
@@ -131,8 +140,9 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitRBracket(xQueryParser.RBracketContext ctx) {
-        return visitChildren(ctx);
+    // rp: '(' rp ')'
+    public ArrayList<Node> visitRBracket(xQueryParser.RBracketContext ctx) {
+        return (ArrayList<Node>) visit(ctx.rp());
     }
 
     @Override
