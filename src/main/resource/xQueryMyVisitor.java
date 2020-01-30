@@ -10,16 +10,14 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
 
     private Node curr; // NOT sure yet
-    private ArrayList<Node> cur = new ArrayList<>(); // current visited list
+    private ArrayList<Node> list = new ArrayList<>(); // current visited list
 
     @Override
     // ap: 'doc("' filename '")' '/' rp
@@ -34,13 +32,13 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
     public ArrayList<Node> visitADesOrSelf(xQueryParser.ADesOrSelfContext ctx) {
         Node root = getRoot(ctx.filename().getText());
         ArrayList<Node> res = new ArrayList<>();
-        res.addAll(cur);
-        for (Node n : cur) {
+        res.addAll(list);
+        for (Node n : list) {
             for (int i = 0; i < n.getChildNodes().getLength(); ++i) {
                 res.add(n.getChildNodes().item(i));
             }
         }
-        cur = res;
+        list = res;
         return (ArrayList<Node>) visit(ctx.rp());
     }
 
@@ -54,15 +52,13 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
     // rp : NAME
     public ArrayList<Node> visitTagName(xQueryParser.TagNameContext ctx) {
         ArrayList<Node> res = new ArrayList<>();
-        for (Node n : cur) {
-            for (int i = 0; i < n.getChildNodes().getLength(); ++i) {
-                Node child = n.getChildNodes().item(i);
-                if (child.getNodeName().equals(ctx.getText())) {
-                    res.add(child);
-                }
+        ArrayList<Node> children = getChildren(list);
+        for (Node child : children) {
+            if (child.getNodeName().equals(ctx.getText())) {
+                res.add(child);
             }
         }
-        cur = res;
+        list = res;
         return res;
     }
 
@@ -70,14 +66,14 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
     // rp : '..'
     public ArrayList<Node> visitParent(xQueryParser.ParentContext ctx) {
         Set<Node> set = new HashSet<>();  // unique parent
-        for (Node n : cur) {
+        for (Node n : list) {
             set.add(n.getParentNode());
         }
         ArrayList<Node> res = new ArrayList<>();
         for (Node n : set) {
             res.add(n);
         }
-        cur = res;
+        list = res;
         return res;
     }
 
@@ -87,6 +83,7 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
     }
 
     @Override
+    // rp: rp ',' rp
     public Object visitRConcat(xQueryParser.RConcatContext ctx) {
         return visitChildren(ctx);
     }
@@ -97,8 +94,17 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
     }
 
     @Override
+    // rp: 'text()'
     public Object visitText(xQueryParser.TextContext ctx) {
-        return visitChildren(ctx);
+        ArrayList<Node> res = new ArrayList<>();
+        ArrayList<Node> children = getChildren(list);
+        for (Node child : children) {
+            if (child.getNodeType() == Node.TEXT_NODE) { // Should we consider "\n" etc.?
+                res.add(child);
+            }
+        }
+        list = res;
+        return res;
     }
 
     @Override
@@ -107,9 +113,11 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
     }
 
     @Override
-    // NOT sure yet
-    public NodeList visitChildren(xQueryParser.ChildrenContext ctx) {
-        return getChildren(curr);
+    // rp: '*'
+    public ArrayList<Node> visitChildren(xQueryParser.ChildrenContext ctx) {
+        ArrayList<Node> res = getChildren(list);
+        list = res;
+        return res;
     }
 
     @Override
@@ -182,11 +190,16 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
         return doc.getDocumentElement();
     }
 
-    // Get the list of children of a node
-    // NOT sure yet
-    private NodeList getChildren(Node node) {
-        if (! node.hasChildNodes()) return null;
-        return node.getChildNodes();
+    // Get the list of children of current nodes
+    private ArrayList<Node> getChildren(ArrayList<Node> list) {
+        ArrayList<Node> childrenList = new ArrayList<>();
+        for (Node n : list) {
+            NodeList children = n.getChildNodes();
+            for (int i = 0; i < children.getLength(); i++) {
+                childrenList.add(children.item(i));
+            }
+        }
+        return childrenList;
     }
 
 }
