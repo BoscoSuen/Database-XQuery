@@ -22,15 +22,19 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
 
     @Override
     // ap: 'doc("' filename '")' '/' rp
+    // NOT sure yet!
     public ArrayList<Node> visitADescendent(xQueryParser.ADescendentContext ctx) {
         Node root = getRoot(ctx.filename().getText());
-        return (ArrayList<Node>) visitChildren(ctx);
+        list.add(root);
+        System.out.println(visit(ctx.rp()));
+        return (ArrayList<Node>) visit(ctx.rp());
     }
 
     @Override
     // ap: 'doc("' filename '")' '//' rp
     public ArrayList<Node> visitADesOrSelf(xQueryParser.ADesOrSelfContext ctx) {
         Node root = getRoot(ctx.filename().getText());
+        list.add(root);
         ArrayList<Node> res = new ArrayList<>();
         res.addAll(list);
         for (Node n : list) {
@@ -103,7 +107,7 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
 
     @Override
     // rp: 'text()'
-    public Object visitText(xQueryParser.TextContext ctx) {
+    public ArrayList<Node> visitText(xQueryParser.TextContext ctx) {
         ArrayList<Node> res = new ArrayList<>();
         ArrayList<Node> children = getChildren(list);
         for (Node child : children) {
