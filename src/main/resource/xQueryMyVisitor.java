@@ -90,15 +90,15 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
     // rp: rp ',' rp
     public ArrayList<Node> visitRConcat(xQueryParser.RConcatContext ctx) {
         Set<Node> set = new HashSet<>();
-        ArrayList<Node> temp = new ArrayList<Node>(list);
+        ArrayList<Node> temp = new ArrayList<>(list);
         visit(ctx.rp(0));
-        ArrayList<Node> left = new ArrayList<Node>(list);
+        ArrayList<Node> left = new ArrayList<>(list);
         list = temp;
         visit(ctx.rp(1));
-        ArrayList<Node> right = new ArrayList<Node>(list);
+        ArrayList<Node> right = new ArrayList<>(list);
         set.addAll(left);
         set.addAll(right);
-        ArrayList<Node> res = new ArrayList<Node>();
+        ArrayList<Node> res = new ArrayList<>();
         for (Node n : set) {
             res.add(n);
         }
