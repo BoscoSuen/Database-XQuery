@@ -11,22 +11,17 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
 
-    private Node curr; // NOT sure yet
     private ArrayList<Node> list = new ArrayList<>(); // current visited list
 
     @Override
     // ap: 'doc("' filename '")' '/' rp
-    // NOT sure yet!
     public ArrayList<Node> visitADescendent(xQueryParser.ADescendentContext ctx) {
         Node root = getRoot(ctx.filename().getText());
         list.add(root);
-        System.out.println(visit(ctx.rp()));
         return (ArrayList<Node>) visit(ctx.rp());
     }
 
@@ -35,13 +30,9 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
     public ArrayList<Node> visitADesOrSelf(xQueryParser.ADesOrSelfContext ctx) {
         Node root = getRoot(ctx.filename().getText());
         list.add(root);
-        ArrayList<Node> res = new ArrayList<>();
-        res.addAll(list);
-        for (Node n : list) {
-            for (int i = 0; i < n.getChildNodes().getLength(); ++i) {
-                res.add(n.getChildNodes().item(i));
-            }
-        }
+        Queue<Node> queue = new LinkedList<Node>(list);
+        ArrayList<Node> res = new ArrayList<Node>(list);
+        getDesOrSelf(res, queue);
         list = res;
         return (ArrayList<Node>) visit(ctx.rp());
     }
@@ -96,13 +87,40 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitRConcat(xQueryParser.RConcatContext ctx) {
-        return visitChildren(ctx);
+    // rp: rp ',' rp
+    public ArrayList<Node> visitRConcat(xQueryParser.RConcatContext ctx) {
+        Set<Node> set = new HashSet<>();
+        ArrayList<Node> temp = new ArrayList<Node>(list);
+        visit(ctx.rp(0));
+        ArrayList<Node> left = new ArrayList<Node>(list);
+        list = temp;
+        visit(ctx.rp(1));
+        ArrayList<Node> right = new ArrayList<Node>(list);
+        set.addAll(left);
+        set.addAll(right);
+        ArrayList<Node> res = new ArrayList<Node>();
+        for (Node n : set) {
+            res.add(n);
+        }
+        list = res;
+        return res;
     }
 
     @Override
-    public Object visitRFilter(xQueryParser.RFilterContext ctx) {
-        return visitChildren(ctx);
+    // rp: rp '[' filter ']'
+    public ArrayList<Node> visitRFilter(xQueryParser.RFilterContext ctx) {
+        visit(ctx.rp());
+        ArrayList<Node> temp = new ArrayList<Node>(list);
+        ArrayList<Node> res = new ArrayList<Node>();
+        for (Node n : temp) {
+            list = new ArrayList<Node>();
+            list.add(n);
+            if (!((ArrayList<Node>)visit(ctx.filter())).isEmpty()) {
+                res.add(n);
+            }
+        }
+        list = res;
+        return res;
     }
 
     @Override
@@ -120,8 +138,10 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitRDescendent(xQueryParser.RDescendentContext ctx) {
-        return visitChildren(ctx);
+    // rp: rp '/' rp
+    public ArrayList<Node> visitRDescendent(xQueryParser.RDescendentContext ctx) {
+        visit(ctx.rp(0));
+        return (ArrayList<Node>) visit(ctx.rp(1));
     }
 
     @Override
@@ -139,8 +159,14 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitRDesOrSelf(xQueryParser.RDesOrSelfContext ctx) {
-        return visitChildren(ctx);
+    // rp: rp '//' rp
+    public ArrayList<Node> visitRDesOrSelf(xQueryParser.RDesOrSelfContext ctx) {
+        visit(ctx.rp(0));
+        Queue<Node> queue = new LinkedList<Node>(list);
+        ArrayList<Node> res = new ArrayList<Node>(list);
+        getDesOrSelf(res, queue);
+        list = res;
+        return (ArrayList<Node>) visit(ctx.rp(1));
     }
 
     @Override
@@ -150,38 +176,128 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitFIs(xQueryParser.FIsContext ctx) {
-        return visitChildren(ctx);
+    // filter : filter 'and' filter
+    public ArrayList<Node> visitFAnd(xQueryParser.FAndContext ctx) {
+        ArrayList<Node> temp = new ArrayList<>(list);
+        ArrayList<Node> left = (ArrayList<Node>) visit(ctx.filter(0));
+        list = temp;
+        ArrayList<Node> right = (ArrayList<Node>) visit(ctx.filter(1));
+        Set<Node> set = new HashSet<>();
+        left.retainAll((right)); // intersection
+        set.addAll(left);
+        ArrayList<Node> res = new ArrayList<Node>();
+        for (Node n : set) {
+            res.add(n);
+        }
+        list = res;
+        return res;
     }
 
     @Override
-    public Object visitFAnd(xQueryParser.FAndContext ctx) {
-        return visitChildren(ctx);
+    // filter : rp
+    public ArrayList<Node> visitFRp(xQueryParser.FRpContext ctx) {
+        ArrayList<Node> temp = new ArrayList<>(list);
+        ArrayList<Node> res = (ArrayList<Node>) visit(ctx.rp());
+        list = temp;
+        return res;
     }
 
     @Override
-    public Object visitFRp(xQueryParser.FRpContext ctx) {
-        return visitChildren(ctx);
+    // filter : filter 'or' filter
+    public ArrayList<Node> visitFOr(xQueryParser.FOrContext ctx) {
+        ArrayList<Node> temp = new ArrayList<>(list);
+        ArrayList<Node> left = (ArrayList<Node>) visit(ctx.filter(0));
+        list = temp;
+        ArrayList<Node> right = (ArrayList<Node>) visit(ctx.filter(1));
+        Set<Node> set = new HashSet<>();
+        set.addAll(left);
+        set.addAll(right);
+        ArrayList<Node> res = new ArrayList<Node>();
+        for (Node n : set) {
+            res.add(n);
+        }
+        list = res;
+        return res;
     }
 
     @Override
-    public Object visitFOr(xQueryParser.FOrContext ctx) {
-        return visitChildren(ctx);
+    // filter: '(' filter ')'
+    public ArrayList<Node> visitFBracket(xQueryParser.FBracketContext ctx) {
+        return (ArrayList<Node>) visit(ctx.filter());
     }
 
     @Override
-    public Object visitFBracket(xQueryParser.FBracketContext ctx) {
-        return visitChildren(ctx);
+    // filter: rp '=' rp / rp 'eq' rp
+    public ArrayList<Node> visitFEqual(xQueryParser.FEqualContext ctx) {
+        ArrayList<Node> temp = new ArrayList<>(list);
+        Set<Node> set = new HashSet<>();
+        for (Node n : list) {
+            ArrayList<Node> t = new ArrayList<Node>();
+            t.add(n);
+            list = t;
+            ArrayList<Node> left = (ArrayList<Node>) visit(ctx.rp(0));
+            list = t;
+            ArrayList<Node> right = (ArrayList<Node>) visit(ctx.rp(1));
+            for (Node l : left) {
+                for (Node r : right) {
+                    if (l.isEqualNode(r)) {
+                        set.add(n);
+                        break;
+                    }
+                }
+            }
+        }
+        ArrayList<Node> res = new ArrayList<Node>();
+        for (Node n : set) {
+            res.add(n);
+        }
+        list = res;
+        return res;
     }
 
     @Override
-    public Object visitFEqual(xQueryParser.FEqualContext ctx) {
-        return visitChildren(ctx);
+    // filter: rp '==' rp / rp 'is' rp
+    public ArrayList<Node> visitFIs(xQueryParser.FIsContext ctx) {
+        ArrayList<Node> temp = new ArrayList<>(list);
+        Set<Node> set = new HashSet<>();
+        for (Node n : list) {
+            ArrayList<Node> t = new ArrayList<Node>();
+            t.add(n);
+            list = t;
+            ArrayList<Node> left = (ArrayList<Node>) visit(ctx.rp(0));
+            list = t;
+            ArrayList<Node> right = (ArrayList<Node>) visit(ctx.rp(1));
+            for (Node l : left) {
+                for (Node r : right) {
+                    if (l.isSameNode(r)) {
+                        set.add(n);
+                        break;
+                    }
+                }
+            }
+        }
+        ArrayList<Node> res = new ArrayList<Node>();
+        for (Node n : set) {
+            res.add(n);
+        }
+        list = res;
+        return res;
     }
 
     @Override
-    public Object visitFNot(xQueryParser.FNotContext ctx) {
-        return visitChildren(ctx);
+    // filter : 'not' filter
+    public ArrayList<Node> visitFNot(xQueryParser.FNotContext ctx) {
+        ArrayList<Node> temp = new ArrayList<>(list);
+        ArrayList<Node> filterRes = (ArrayList<Node>) visit(ctx.filter());
+        Set<Node> set = new HashSet<>();
+        set.addAll(temp);
+        set.removeAll(filterRes);
+        ArrayList<Node> res = new ArrayList<Node>();
+        for (Node n : set) {
+            res.add(n);
+        }
+        list = res;
+        return res;
     }
 
     // Get the root node of an input file
@@ -214,6 +330,21 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
             }
         }
         return childrenList;
+    }
+
+    // Get descendants of a node, including node itself
+    private void getDesOrSelf(ArrayList<Node> res, Queue<Node>  queue) {
+        while (!queue.isEmpty()) {
+            Node n = queue.poll();
+            if (!n.hasChildNodes()) {
+                continue;
+            }
+            NodeList children = n.getChildNodes();
+            for (int i = 0; i < children.getLength(); i++) {
+                res.add(children.item(i));
+                queue.offer(children.item(i));
+            }
+        }
     }
 
 }
