@@ -60,15 +60,11 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
     @Override
     // rp : '..'
     public ArrayList<Node> visitParent(xQueryParser.ParentContext ctx) {
-        Set<Node> set = new HashSet<>();  // unique parent
-        for (Node n : list) {
-            set.add(n.getParentNode());
-        }
         ArrayList<Node> res = new ArrayList<>();
-        for (Node n : set) {
-            res.add(n);
+        for (Node n : list) {
+            res.add(n.getParentNode());
         }
-        list = res;
+        list = unique(res);
         return res;
     }
 
@@ -123,7 +119,8 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
     // rp: rp '/' rp
     public ArrayList<Node> visitRDescendent(xQueryParser.RDescendentContext ctx) {
         visit(ctx.rp(0));
-        return (ArrayList<Node>)visit(ctx.rp(1));
+        visit(ctx.rp(1));
+        return unique(list);
     }
 
     @Override
@@ -133,27 +130,24 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
         Queue<Node> queue = new LinkedList<>(list);
         ArrayList<Node> res = new ArrayList<>(list);
         getDesOrSelf(res, queue);
-        list = res;
-        return (ArrayList<Node>) visit(ctx.rp(1));
+        list = unique(res);
+        visit(ctx.rp(1));
+        return unique(list);
     }
 
     @Override
     // rp: rp ',' rp
     public ArrayList<Node> visitRConcat(xQueryParser.RConcatContext ctx) {
-        Set<Node> set = new HashSet<>();
+        ArrayList<Node> res = new ArrayList<>();
         ArrayList<Node> temp = new ArrayList<>(list);
         visit(ctx.rp(0));
         ArrayList<Node> left = new ArrayList<>(list);
         list = temp;
         visit(ctx.rp(1));
         ArrayList<Node> right = new ArrayList<>(list);
-        set.addAll(left);
-        set.addAll(right);
-        ArrayList<Node> res = new ArrayList<>();
-        for (Node n : set) {
-            res.add(n);
-        }
-        list = res;
+        res.addAll(left);
+        res.addAll(right);
+        list = unique(res);
         return res;
     }
 
@@ -193,7 +187,7 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
     // filter: rp '=' rp / rp 'eq' rp
     public ArrayList<Node> visitFEqual(xQueryParser.FEqualContext ctx) {
         ArrayList<Node> temp = new ArrayList<>(list);
-        Set<Node> set = new HashSet<>();
+        ArrayList<Node> res = new ArrayList<>();
         for (Node n : temp) {
             ArrayList<Node> t = new ArrayList<>();
             t.add(n);
@@ -201,20 +195,11 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
             ArrayList<Node> left = (ArrayList<Node>) visit(ctx.rp(0));
             list = t;
             ArrayList<Node> right = (ArrayList<Node>) visit(ctx.rp(1));
-            for (Node l : left) {
-                for (Node r : right) {
-                    if (l.isEqualNode(r)) {
-                        set.add(n);
-                        break;
-                    }
-                }
+            if (hasEqualOrSame(left, right, true)) {
+                res.add(n);
             }
         }
-        ArrayList<Node> res = new ArrayList<>();
-        for (Node n : set) {
-            res.add(n);
-        }
-        list = res;
+        list = unique(res);
         return res;
     }
 
@@ -222,7 +207,7 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
     // filter: rp '==' rp / rp 'is' rp
     public ArrayList<Node> visitFIs(xQueryParser.FIsContext ctx) {
         ArrayList<Node> temp = new ArrayList<>(list);
-        Set<Node> set = new HashSet<>();
+        ArrayList<Node> res = new ArrayList<>();
         for (Node n : temp) {
             ArrayList<Node> t = new ArrayList<>();
             t.add(n);
@@ -230,20 +215,11 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
             ArrayList<Node> left = (ArrayList<Node>) visit(ctx.rp(0));
             list = t;
             ArrayList<Node> right = (ArrayList<Node>) visit(ctx.rp(1));
-            for (Node l : left) {
-                for (Node r : right) {
-                    if (l.isSameNode(r)) {
-                        set.add(n);
-                        break;
-                    }
-                }
+            if (hasEqualOrSame(left, right, false)) {
+                res.add(n);
             }
         }
-        ArrayList<Node> res = new ArrayList<>();
-        for (Node n : set) {
-            res.add(n);
-        }
-        list = res;
+        list = unique(res);
         return res;
     }
 
@@ -321,6 +297,31 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
                 queue.offer(children.item(i));
             }
         }
+    }
+
+    // If there exists any equal or same nodes in left and right lists
+    private boolean hasEqualOrSame(ArrayList<Node> left, ArrayList<Node> right, boolean isEqual) {
+        for (Node l : left) {
+            for (Node r : right) {
+                if ((isEqual && l.isEqualNode(r)) || (!isEqual && l.isSameNode(r))) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    // Remove duplicate elements in the list
+    private ArrayList<Node> unique(ArrayList<Node> input) {
+        ArrayList<Node> res = new ArrayList<>();
+        for (Node i : input) {
+            if (res.contains(i)) {
+                continue;
+            }
+            res.add(i);
+        }
+        input = res;
+        return input;
     }
 
 }
