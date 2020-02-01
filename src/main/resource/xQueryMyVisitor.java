@@ -177,7 +177,10 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
     @Override
     // filter : rp
     public ArrayList<Node> visitFRp(xQueryParser.FRpContext ctx) {
-        return (ArrayList<Node>) visit(ctx.rp());
+        ArrayList<Node> temp = new ArrayList<>(list);
+        ArrayList<Node> res = (ArrayList<Node>) visit(ctx.rp());
+        list = temp;
+        return res;
     }
 
     @Override
@@ -247,53 +250,30 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
     @Override
     // filter : filter 'and' filter
     public ArrayList<Node> visitFAnd(xQueryParser.FAndContext ctx) {
-        ArrayList<Node> temp = new ArrayList<>(list);
         ArrayList<Node> left = (ArrayList<Node>) visit(ctx.filter(0));
-        list = temp;
         ArrayList<Node> right = (ArrayList<Node>) visit(ctx.filter(1));
         Set<Node> set = new HashSet<>();
         left.retainAll((right)); // intersection
         set.addAll(left);
-        ArrayList<Node> res = new ArrayList<>();
-        for (Node n : set) {
-            res.add(n);
-        }
-        list = res;
-        return res;
+        return set.size() == 0? new ArrayList<>() : list;
     }
 
     @Override
     // filter : filter 'or' filter
     public ArrayList<Node> visitFOr(xQueryParser.FOrContext ctx) {
-        ArrayList<Node> temp = new ArrayList<>(list);
         ArrayList<Node> left = (ArrayList<Node>) visit(ctx.filter(0));
-        list = temp;
         ArrayList<Node> right = (ArrayList<Node>) visit(ctx.filter(1));
         Set<Node> set = new HashSet<>();
         set.addAll(left); // union
         set.addAll(right);
-        ArrayList<Node> res = new ArrayList<>();
-        for (Node n : set) {
-            res.add(n);
-        }
-        list = res;
-        return res;
+        return set.size() == 0? new ArrayList<>() : list;
     }
 
     @Override
     // filter : 'not' filter
     public ArrayList<Node> visitFNot(xQueryParser.FNotContext ctx) {
-        ArrayList<Node> temp = new ArrayList<>(list);
         ArrayList<Node> filterRes = (ArrayList<Node>) visit(ctx.filter());
-        Set<Node> set = new HashSet<>();
-        set.addAll(temp);
-        set.removeAll(filterRes);
-        ArrayList<Node> res = new ArrayList<>();
-        for (Node n : set) {
-            res.add(n);
-        }
-        list = res;
-        return res;
+        return filterRes.size() == 0? list : new ArrayList<>();
     }
 
     // Get the root node of an input file
