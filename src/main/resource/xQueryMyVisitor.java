@@ -208,17 +208,22 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
     public ArrayList<Node> visitFIs(xQueryParser.FIsContext ctx) {
         ArrayList<Node> temp = new ArrayList<>(list);
         ArrayList<Node> res = new ArrayList<>();
-        for (Node n : temp) {
-            ArrayList<Node> t = new ArrayList<>();
-            t.add(n);
-            list = t;
-            ArrayList<Node> left = (ArrayList<Node>) visit(ctx.rp(0));
-            list = t;
-            ArrayList<Node> right = (ArrayList<Node>) visit(ctx.rp(1));
-            if (hasEqualOrSame(left, right, false)) {
-                res.add(n);
-            }
-        }
+//        for (Node n : temp) {
+//            ArrayList<Node> t = new ArrayList<>();
+//            t.add(n);
+//            list = t;
+//            ArrayList<Node> left = (ArrayList<Node>) visit(ctx.rp(0));
+//            list = t;
+//            ArrayList<Node> right = (ArrayList<Node>) visit(ctx.rp(1));
+//            if (hasEqualOrSame(left, right, false)) {
+//                res.add(n);
+//            }
+//        }
+        ArrayList<Node> left = (ArrayList<Node>) visit(ctx.rp(0));
+        list = temp;
+        ArrayList<Node> right = (ArrayList<Node>) visit(ctx.rp(1));
+        res.addAll(left);
+        res.addAll(right);
         list = unique(res);
         return res;
     }
