@@ -1,6 +1,6 @@
 
 /* XPath.g4
- * https://en.wikipedia.org/wiki/XPath
+ * Created by Xiaohan Zhu and Zhiqiang Sun
  */
 
 grammar xQuery;
@@ -40,5 +40,52 @@ filter
 	| 'not' filter                 # FNot
 	;
 
+var : '$' NAME
+    ;
+
+xq
+    : var                          # XQValue
+    | STRINGCONSTANT               # StringConstant
+    | ap                           # XQAp
+    | '(' xq ')'                   # XQBracket
+    | xq ',' xq                    # XQConcat
+    | xq '/' rp                    # XQChild
+    | xq '//' rp                   # XQDescendent
+    | '<' NAME '>' '{' xq '}' '</' NAME '>'   # XQNodeConstrctor
+    | forClause? letClause? whereClause? returnClause  # XQFLWOR
+    | letClause xq                 # XQDefine
+    ;
+
+forClause
+    : 'for' var 'in' xq(',' var 'in' xq)*
+    ;
+
+letClause
+    : 'let' var ':=' xq(',' var ':=' xq)*
+    ;
+
+whereClause
+    : 'where' cond
+    ;
+
+cond
+    : xq '=' xq                     # XQEqual
+    | xq 'eq' xq                    # XQEqual
+    | xq '==' xq                    # XQIs
+    | xq 'is' xq                    # XQIs
+    | 'empty' '(' xq ')'            # XQIsEmpty
+    | 'some' var 'in' xq(',' var 'in' xq)* 'satisfies' cond  # XQSatisfy
+    | '(' cond ')'                  # XQCond
+    | cond 'and' cond               # XQAndCond
+    | cond 'or' cond                # XQOrCond
+    | 'not' cond                    # XQNot
+    ;
+
+returnClause
+    : 'return' xq
+    ;
+
+
+STRINGCONSTANT: '"' [\s\S]+ '"';
 NAME: [a-zA-Z0-9_-]+;
 WS : [ \t\r\n]+ -> skip;
