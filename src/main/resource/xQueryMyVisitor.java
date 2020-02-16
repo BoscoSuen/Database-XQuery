@@ -187,40 +187,28 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
     // filter: rp '=' rp / rp 'eq' rp
     public ArrayList<Node> visitFEqual(xQueryParser.FEqualContext ctx) {
         ArrayList<Node> temp = new ArrayList<>(list);
-        ArrayList<Node> res = new ArrayList<>();
-        for (Node n : temp) {
-            ArrayList<Node> t = new ArrayList<>();
-            t.add(n);
-            list = t;
-            ArrayList<Node> left = (ArrayList<Node>) visit(ctx.rp(0));
-            list = t;
-            ArrayList<Node> right = (ArrayList<Node>) visit(ctx.rp(1));
-            if (hasEqualOrSame(left, right, true)) {
-                res.add(n);
-            }
+        ArrayList<Node> left = (ArrayList<Node>) visit(ctx.rp(0));
+        list = temp;
+        ArrayList<Node> right = (ArrayList<Node>) visit(ctx.rp(1));
+        list = temp;
+        if (hasEqualOrSame(left, right, true)) {
+            return temp;
         }
-        list = unique(res);
-        return res;
+        return new ArrayList<>();
     }
 
     @Override
     // filter: rp '==' rp / rp 'is' rp
     public ArrayList<Node> visitFIs(xQueryParser.FIsContext ctx) {
         ArrayList<Node> temp = new ArrayList<>(list);
-        ArrayList<Node> res = new ArrayList<>();
-        for (Node n : temp) {
-            ArrayList<Node> t = new ArrayList<>();
-            t.add(n);
-            list = t;
-            ArrayList<Node> left = (ArrayList<Node>) visit(ctx.rp(0));
-            list = t;
-            ArrayList<Node> right = (ArrayList<Node>) visit(ctx.rp(1));
-            if (hasEqualOrSame(left, right, false)) {
-                res.add(n);
-            }
+        ArrayList<Node> left = (ArrayList<Node>) visit(ctx.rp(0));
+        list = temp;
+        ArrayList<Node> right = (ArrayList<Node>) visit(ctx.rp(1));
+        list = temp;
+        if (hasEqualOrSame(left, right, false)) {
+            return temp;
         }
-        list = unique(res);
-        return res;
+        return new ArrayList<>();
     }
 
     @Override
