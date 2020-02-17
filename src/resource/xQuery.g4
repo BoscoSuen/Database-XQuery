@@ -46,8 +46,8 @@ var : '$' NAME
 
 xq
     : var                          # XQValue
-    | STRINGCONSTANT               # StringConstant
     | ap                           # XQAp
+    | STRINGCONSTANT               # StringConstant
     | '(' xq ')'                   # XQBracket
     | xq ',' xq                    # XQConcat
     | xq '/' rp                    # XQChild
@@ -89,4 +89,8 @@ returnClause
 
 NAME: [a-zA-Z0-9_-]+;
 WS : [ \t\r\n]+ -> skip;
-STRINGCONSTANT:'"'+[a-zA-Z0-9,.!?;''""-]+'"';
+//STRINGCONSTANT:'"'(ESC|.)*?'"';
+//fragment
+//ESC:'\\"'|'\\\\';//2-charsequences\"and\\
+STRINGCONSTANT: '"' [a-zA-Z0-9_,.;:'"?!@#$%^&*` \t\r\n-]* '"';
+// have to consider empty string, should use *
