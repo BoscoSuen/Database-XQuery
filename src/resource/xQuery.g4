@@ -1,5 +1,5 @@
 
-/* XPath.g4
+/* XQuery.g4
  * Created by Xiaohan Zhu and Zhiqiang Sun
  */
 
@@ -9,6 +9,7 @@ ap
 	: 'doc("' filename '")' '/' rp          # ADescendent
 	| 'doc("' filename '")' '//' rp         # ADesOrSelf
 	;
+
 
 filename
 	: NAME ('.' NAME)?
@@ -86,6 +87,6 @@ returnClause
     ;
 
 
-STRINGCONSTANT: '"' [\s\S]+ '"';
 NAME: [a-zA-Z0-9_-]+;
 WS : [ \t\r\n]+ -> skip;
+STRINGCONSTANT:'"'+[a-zA-Z0-9,.!?;''""-]+'"';

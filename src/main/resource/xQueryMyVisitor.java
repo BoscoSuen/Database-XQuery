@@ -312,4 +312,54 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
         return input;
     }
 
+
+
+
+
+
+    // Xquery
+    Map<String, ArrayList<Node>> textMap = new HashMap<>();
+    Deque<HashMap<String, ArrayList<Node>>> deque = new LinkedList<>();  // used for iteration clause
+    // current rp Node List: list
+
+    @Override
+    // xq: var
+    public ArrayList<Node> visitVar(xQueryParser.VarContext ctx) {
+        return textMap.get(ctx.getText());    // makeText(s)
+    }
+
+    // xq: stringConstant
+
+    @Override
+    // xq: ap
+    public ArrayList<Node> visitXQAp(xQueryParser.XQApContext ctx) {
+        return (ArrayList<Node>) visit(ctx.ap());
+    }
+
+    @Override
+    // xq: ( xq )
+    public ArrayList<Node> visitXQBracket(xQueryParser.XQBracketContext ctx) {
+        return (ArrayList<Node>) visit(ctx.xq());
+    }
+
+    @Override
+    // xq: xq , xq
+    public ArrayList<Node> visitXQConcat(xQueryParser.XQConcatContext ctx) {
+        ArrayList<Node> res = new ArrayList<>();
+        ArrayList<Node> temp = new ArrayList<>(list);
+        visit(ctx.xq(0));
+        ArrayList<Node> left = new ArrayList<>(list);
+        list = temp;
+        visit(ctx.xq(1));
+        List<Node> right = new ArrayList<>(list);
+        res.addAll(left);
+        res.addAll(right);
+        list = unique(res);
+        return res;
+    }
+
+    // xq: xq '/' rp
+
+    // xq: xq '//' rp
+
 }
