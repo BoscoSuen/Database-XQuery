@@ -1,4 +1,3 @@
-
 /* XQuery.g4
  * Created by Xiaohan Zhu and Zhiqiang Sun
  */

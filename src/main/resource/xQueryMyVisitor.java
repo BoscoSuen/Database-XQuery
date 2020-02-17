@@ -1,3 +1,7 @@
+/**
+ * Created by Xiaohan Zhu and Zhiqiang Sun
+ */
+
 package main.resource;
 
 import org.w3c.dom.Document;
@@ -20,9 +24,10 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
     @Override
     // ap: 'doc("' filename '")' '/' rp
     public ArrayList<Node> visitADescendent(xQueryParser.ADescendentContext ctx) {
-        Node root = getRoot(ctx.filename().getText());
-        list.add(root);
-        return (ArrayList<Node>) visit(ctx.rp());
+//        Node root = getRoot(ctx.filename().getText());
+//        list.add(root);
+//        return (ArrayList<Node>) visit(ctx.rp());
+        return (ArrayList<Node>) visitChildren(ctx);
     }
 
     @Override
@@ -312,11 +317,6 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
         return input;
     }
 
-
-
-
-
-
     // Xquery
     Map<String, ArrayList<Node>> textMap = new HashMap<>();
     Deque<HashMap<String, ArrayList<Node>>> deque = new LinkedList<>();  // used for iteration clause
@@ -358,7 +358,12 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
         return res;
     }
 
+    @Override
     // xq: xq '/' rp
+    public ArrayList<Node> visitXQChild(xQueryParser.XQChildContext ctx) {
+        list = (ArrayList<Node>) visit(ctx.xq());
+        return (ArrayList<Node>) visit(ctx.rp());
+    }
 
     // xq: xq '//' rp
 
