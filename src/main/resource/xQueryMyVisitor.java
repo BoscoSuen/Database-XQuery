@@ -330,9 +330,19 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
     @Override
     // xq: stringConstant
     public ArrayList<Node> visitStringConstant(xQueryParser.StringConstantContext ctx) {
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        DocumentBuilder db = null;
+        try {
+            db = dbf.newDocumentBuilder();
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        }
+        Document doc = db.newDocument();
+        
         String curStr = ctx.STRINGCONSTANT().toString();
-        System.out.println("current String is: " + curStr);
+        Node newNode = doc.createTextNode(curStr);
         ArrayList<Node> res = new ArrayList<>();
+        res.add(newNode);
         return res;
     }
 
@@ -407,7 +417,7 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
                 newNode.appendChild(deepCopy);
             }
         }
-        ArrayList<Node> res =  new ArrayList<Node>();
+        ArrayList<Node> res =  new ArrayList<>();
         res.add(newNode);
         return res;
     }

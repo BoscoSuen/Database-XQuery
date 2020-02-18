@@ -49,6 +49,12 @@ public class XQuery {
         xQueryMyVisitor visitor = new xQueryMyVisitor();
         ArrayList<Node> list = (ArrayList<Node>) visitor.visit(parseTree);
         System.out.println("Number of nodes found: " + list.size());
+
+        for (Node n : list) {
+            String curOutput = printNode(n);
+            System.out.println(curOutput);
+            // fileOutputStream.write(curOutput.getBytes());
+        }
     }
 
     // Transform node to printable string
