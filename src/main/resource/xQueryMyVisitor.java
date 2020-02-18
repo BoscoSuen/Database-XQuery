@@ -8,6 +8,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -380,5 +381,34 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
         list = unique(list);
         visit(ctx.rp());
         return unique(list);
+    }
+
+    // xq: '<' NAME '>' '{' xq '}' '</' NAME '>'
+    public ArrayList<Node> visitXQNodeConstrctor(xQueryParser.XQNodeConstrctorContext ctx) {
+        ArrayList<Node> res = (ArrayList<Node>) visit(ctx.xq());
+        String tagName = ctx.NAME(0).getText();
+        return makeElem(tagName, res);
+    }
+
+    private ArrayList<Node> makeElem(String tagName, ArrayList<Node> nodeList) {
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        DocumentBuilder db = null;
+        try {
+            db = dbf.newDocumentBuilder();
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        }
+        Document doc = db.newDocument();
+
+        Node newNode = doc.createElement(tagName);
+        for (Node node : nodeList) {
+            if (node != null) {
+                Node deepCopy = doc.importNode(node, true);
+                newNode.appendChild(deepCopy);
+            }
+        }
+        ArrayList<Node> res =  new ArrayList<Node>();
+        res.add(newNode);
+        return res;
     }
 }
