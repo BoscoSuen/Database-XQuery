@@ -15,6 +15,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.*;
 
 public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
@@ -306,14 +307,11 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
 
     // Remove duplicate elements in the list
     private ArrayList<Node> unique(ArrayList<Node> input) {
-        ArrayList<Node> res = new ArrayList<>();
+        Set<Node> res = new HashSet<>();
         for (Node i : input) {
-            if (res.contains(i)) {
-                continue;
-            }
             res.add(i);
         }
-        input = res;
+        input = new ArrayList<>(res);
         return input;
     }
 
@@ -328,7 +326,14 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
         return textMap.get(ctx.getText());    // makeText(s)
     }
 
+    @Override
     // xq: stringConstant
+    public ArrayList<Node> visitStringConstant(xQueryParser.StringConstantContext ctx) {
+        String curStr = ctx.STRINGCONSTANT().toString();
+        System.out.println("current String is: " + curStr);
+        ArrayList<Node> res = new ArrayList<>();
+        return res;
+    }
 
     @Override
     // xq: ap
@@ -362,9 +367,18 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
     // xq: xq '/' rp
     public ArrayList<Node> visitXQChild(xQueryParser.XQChildContext ctx) {
         list = (ArrayList<Node>) visit(ctx.xq());
-        return (ArrayList<Node>) visit(ctx.rp());
+        visit(ctx.rp());
+        return unique(list);
     }
 
     // xq: xq '//' rp
-
+    public ArrayList<Node> visitXQDescendent(xQueryParser.XQDescendentContext ctx) {
+        list = (ArrayList<Node>) visit(ctx.xq());
+        Queue<Node> queue = new LinkedList<>(list);
+        ArrayList<Node> res = new ArrayList<>(list);
+        getDesOrSelf(res, queue);
+        list = unique(list);
+        visit(ctx.rp());
+        return unique(list);
+    }
 }
