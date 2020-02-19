@@ -26,10 +26,8 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
     @Override
     // ap: 'doc("' filename '")' '/' rp
     public ArrayList<Node> visitADescendent(xQueryParser.ADescendentContext ctx) {
-//        Node root = getRoot(ctx.filename().getText());
-//        list.add(root);
-//        return (ArrayList<Node>) visit(ctx.rp());
-        return (ArrayList<Node>) visitChildren(ctx);
+        Node root = getRoot(ctx.filename().getText());
+        return (ArrayList<Node>) visit(ctx.rp());
     }
 
     @Override
@@ -318,7 +316,6 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
 
     // Xquery
     Map<String, ArrayList<Node>> textMap = new HashMap<>();
-    Deque<HashMap<String, ArrayList<Node>>> deque = new LinkedList<>();  // used for iteration clause
     // current rp Node List: list
 
     @Override
@@ -420,5 +417,28 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
         ArrayList<Node> res =  new ArrayList<>();
         res.add(newNode);
         return res;
+    }
+
+    @Override
+
+    public ArrayList<HashMap<String, Node>> visitForClause(xQueryParser.ForClauseContext ctx) {
+        ArrayList<HashMap<String, Node>> res = new ArrayList<>();
+        int idx = 0;  // current for loop idx
+        Deque<HashMap<String, Node>> deque = new LinkedList<>();  // used for BFS
+        String var0 = ctx.var(0).getText();
+        ArrayList<Node> list0 = (ArrayList<Node>) visit(ctx.xq(0));
+        for (Node n : list0) {
+            HashMap<String, Node> map = new HashMap<>();
+            map.put(var0, n);
+            deque.offerLast(map);
+        }
+        while (!deque.isEmpty()) {
+            idx++;
+            int size = deque.size();
+            for (int i = 0; i < size; ++i) {
+                Map<String, Node> curMap = deque.pollFirst();
+
+            }
+        }
     }
 }
