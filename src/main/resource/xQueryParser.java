@@ -1277,20 +1277,20 @@ public class xQueryParser extends Parser {
 				break;
 			case 2:
 				{
-				_localctx = new StringConstantContext(_localctx);
+				_localctx = new XQApContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
 				setState(116);
-				match(STRINGCONSTANT);
+				ap();
 				}
 				break;
 			case 3:
 				{
-				_localctx = new XQApContext(_localctx);
+				_localctx = new StringConstantContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
 				setState(117);
-				ap();
+				match(STRINGCONSTANT);
 				}
 				break;
 			case 4:
@@ -2192,8 +2192,8 @@ public class xQueryParser extends Parser {
 		"\2\2dN\3\2\2\2dR\3\2\2\2dV\3\2\2\2dZ\3\2\2\2d^\3\2\2\2db\3\2\2\2en\3\2"+
 		"\2\2fg\f\5\2\2gh\7\25\2\2hm\5\b\5\6ij\f\4\2\2jk\7\26\2\2km\5\b\5\5lf\3"+
 		"\2\2\2li\3\2\2\2mp\3\2\2\2nl\3\2\2\2no\3\2\2\2o\t\3\2\2\2pn\3\2\2\2qr"+
-		"\7\30\2\2rs\7\'\2\2s\13\3\2\2\2tu\b\7\1\2u\u0094\5\n\6\2v\u0094\7)\2\2"+
-		"w\u0094\5\2\2\2xy\7\f\2\2yz\5\f\7\2z{\7\r\2\2{\u0094\3\2\2\2|}\7\31\2"+
+		"\7\30\2\2rs\7\'\2\2s\13\3\2\2\2tu\b\7\1\2u\u0094\5\n\6\2v\u0094\5\2\2"+
+		"\2w\u0094\7)\2\2xy\7\f\2\2yz\5\f\7\2z{\7\r\2\2{\u0094\3\2\2\2|}\7\31\2"+
 		"\2}~\7\'\2\2~\177\7\32\2\2\177\u0080\7\33\2\2\u0080\u0081\5\f\7\2\u0081"+
 		"\u0082\7\34\2\2\u0082\u0083\7\35\2\2\u0083\u0084\7\'\2\2\u0084\u0085\7"+
 		"\32\2\2\u0085\u0094\3\2\2\2\u0086\u0088\5\16\b\2\u0087\u0086\3\2\2\2\u0087"+

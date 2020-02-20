@@ -35,7 +35,7 @@ public class XQuery {
             sb.append(str);
         }
         String stringBuffer = sb.toString();
-        System.out.println(stringBuffer);
+        System.out.println("Query String is: " + stringBuffer);
         CharStream input = CharStreams.fromString(stringBuffer);
 
 //        use ANTLRInputStream:
@@ -52,8 +52,7 @@ public class XQuery {
 
         for (Node n : list) {
             String curOutput = printNode(n);
-            System.out.println(curOutput);
-            // fileOutputStream.write(curOutput.getBytes());
+//            System.out.println("curOutput is: " + curOutput);
         }
     }
 
@@ -72,4 +71,3 @@ public class XQuery {
         return stringWriter.toString();
     }
 }
-

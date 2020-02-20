@@ -4,6 +4,7 @@
 
 package main.resource;
 
+import jdk.nashorn.internal.runtime.arrays.ArrayLikeIterator;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -26,10 +27,8 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
     @Override
     // ap: 'doc("' filename '")' '/' rp
     public ArrayList<Node> visitADescendent(xQueryParser.ADescendentContext ctx) {
-//        Node root = getRoot(ctx.filename().getText());
-//        list.add(root);
-//        return (ArrayList<Node>) visit(ctx.rp());
-        return (ArrayList<Node>) visitChildren(ctx);
+        Node root = getRoot(ctx.filename().getText());
+        return (ArrayList<Node>) visit(ctx.rp());
     }
 
     @Override
@@ -318,7 +317,6 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
 
     // Xquery
     Map<String, ArrayList<Node>> textMap = new HashMap<>();
-    Deque<HashMap<String, ArrayList<Node>>> deque = new LinkedList<>();  // used for iteration clause
     // current rp Node List: list
 
     @Override
@@ -338,7 +336,7 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
             e.printStackTrace();
         }
         Document doc = db.newDocument();
-        
+
         String curStr = ctx.STRINGCONSTANT().toString();
         Node newNode = doc.createTextNode(curStr);
         ArrayList<Node> res = new ArrayList<>();
@@ -412,13 +410,186 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
 
         Node newNode = doc.createElement(tagName);
         for (Node node : nodeList) {
-            if (node != null) {
-                Node deepCopy = doc.importNode(node, true);
-                newNode.appendChild(deepCopy);
-            }
+            Node deepCopy = doc.importNode(node, true);
+            newNode.appendChild(deepCopy);
         }
         ArrayList<Node> res =  new ArrayList<>();
         res.add(newNode);
+        return res;
+    }
+
+    @Override
+    // xq: forClause
+    public ArrayList<HashMap<String, ArrayList<Node>>> visitForClause(xQueryParser.ForClauseContext ctx) {
+        ArrayList<HashMap<String, Node>> combined = new ArrayList<>();
+        ArrayList<HashMap<String, ArrayList<Node>>> res = new ArrayList<>();
+        int idx = 0;  // current for loop idx
+        Deque<HashMap<String, Node>> deque = new LinkedList<>();  // used for BFS
+        String var0 = ctx.var(0).getText();
+        ArrayList<Node> list0 = (ArrayList<Node>) visit(ctx.xq(0));
+        for (Node n : list0) {
+            HashMap<String, Node> map = new HashMap<>();
+            map.put(var0, n);
+            deque.offer(map);
+        }
+        while (!deque.isEmpty()) {
+            idx++;
+            int size = deque.size();
+            if (idx == ctx.var().size() - 1) {
+                // get all the combined map list
+                while (!deque.isEmpty()) {
+                    HashMap<String, Node> curMap = deque.poll();
+                    combined.add(curMap);
+                }
+            } else {
+                // combine all the variables in the next loop.
+                for (int i = 0; i < size; ++i) {
+                    HashMap<String, Node> curMap = deque.poll();
+                    String nextVar = ctx.var(idx).getText(); // current map bind the next var-node pairs
+                    ArrayList<Node> nextList = (ArrayList<Node>) visit(ctx.xq(idx));
+                    for (Node n : nextList) {
+                        HashMap<String, Node> map = new HashMap<>(curMap);
+                        map.put(nextVar, n);
+                        deque.offer(map);
+                    }
+                }
+            }
+        }
+        // now we get all the combined map list,
+        // we have to convert the node to list of node to match the var query
+        for (HashMap<String, Node> map : combined) {
+            HashMap<String, ArrayList<Node>> curMap = new HashMap<>();
+            for (String var : map.keySet()) {
+                ArrayList<Node> nodeList = new ArrayList<>();
+                nodeList.add(map.get(var));
+                curMap.put(var, nodeList);
+            }
+            res.add(curMap);
+        }
+        return res;
+    }
+
+    @Override
+    // xq: where clause
+    public ArrayList<Node> visitWhereClause(xQueryParser.WhereClauseContext ctx) {
+        return (ArrayList<Node>) visit(ctx.cond());
+    }
+
+    @Override
+    // xq: return clause
+    public ArrayList<Node> visitReturnClause(xQueryParser.ReturnClauseContext ctx) {
+        return (ArrayList<Node>) visit(ctx.xq());
+    }
+
+    @Override
+    // xq: forClause letClause? whereClause? returnClause  # XQFLWOR
+    public ArrayList<Node> visitXQFLWOR(xQueryParser.XQFLWORContext ctx) {
+        ArrayList<Node> res = new ArrayList<>();
+        if (ctx.forClause() == null) {
+            return res;
+        }
+        ArrayList<HashMap<String, ArrayList<Node>>> combinedList = (ArrayList<HashMap<String, ArrayList<Node>>>) visit(ctx.forClause());
+        HashMap<String, ArrayList<Node>> temp = new HashMap<>(textMap);
+        for (HashMap<String, ArrayList<Node>> map : combinedList) {
+            textMap.putAll(map); // the current query map cover the original text map
+            if (ctx.letClause() != null) {
+                visit(ctx.letClause());
+            }
+            if (ctx.whereClause() != null) {
+                visit(ctx.whereClause());
+                res.addAll((ArrayList<Node>)visit(ctx.returnClause()));
+            }
+            res.addAll((ArrayList<Node>)visit(ctx.returnClause()));
+        }
+        textMap = temp;
+        return res;
+    }
+
+    @Override
+    // xq: letClause xq
+    public ArrayList<Node> visitXQDefine(xQueryParser.XQDefineContext ctx) {
+        return null;
+    }
+
+    @Override
+    public ArrayList<Node> visitLetClause(xQueryParser.LetClauseContext ctx) {
+        return null;
+    }
+
+    // cond: xq '=' xq / xq 'eq' xq
+    public ArrayList<Node> visitXQEqual(xQueryParser.XQEqualContext ctx) {
+        ArrayList<Node> temp = new ArrayList<>(list);
+        ArrayList<Node> left = (ArrayList<Node>) visit(ctx.xq(0));
+        list = temp;
+        ArrayList<Node> right = (ArrayList<Node>) visit(ctx.xq(1));
+        list = temp;
+        if (hasEqualOrSame(left, right, true)) {
+            return temp;
+        }
+        return new ArrayList<>();
+    }
+
+    // cond: xq '==' xq / xq 'is' xq
+    public ArrayList<Node> visitXQIs(xQueryParser.XQIsContext ctx) {
+        ArrayList<Node> temp = new ArrayList<>(list);
+        ArrayList<Node> left = (ArrayList<Node>) visit(ctx.xq(0));
+        list = temp;
+        ArrayList<Node> right = (ArrayList<Node>) visit(ctx.xq(1));
+        list = temp;
+        if (hasEqualOrSame(left, right, false)) {
+            return temp;
+        }
+        return new ArrayList<>();
+    }
+
+    // cond: '(' cond ')'
+    public ArrayList<Node> visitXQCond(xQueryParser.XQCondContext ctx) {
+        return (ArrayList<Node>) visit(ctx.cond());
+    }
+
+    // cond: 'empty' '(' xq ')'
+    public ArrayList<Node> visitXQIsEmpty(xQueryParser.XQIsEmptyContext ctx) {
+        ArrayList<Node> temp = new ArrayList<>(list);
+        ArrayList<Node> res = (ArrayList<Node>) visit(ctx.xq());
+        list = temp;
+        return res.size() == 0? list : new ArrayList<>();
+    }
+
+    // cond: cond 'or' cond
+    public ArrayList<Node> visitXQOrCond(xQueryParser.XQOrCondContext ctx) {
+        ArrayList<Node> left = (ArrayList<Node>) visit(ctx.cond(0));
+        ArrayList<Node> right = (ArrayList<Node>) visit(ctx.cond(1));
+        Set<Node> set = new HashSet<>();
+        set.addAll(left); // union
+        set.addAll(right);
+        return set.size() == 0? new ArrayList<>() : list;
+    }
+
+    // cond: cond 'and' cond
+    public ArrayList<Node> visitXQAndCond(xQueryParser.XQAndCondContext ctx) {
+        ArrayList<Node> left = (ArrayList<Node>) visit(ctx.cond(0));
+        ArrayList<Node> right = (ArrayList<Node>) visit(ctx.cond(1));
+        Set<Node> set = new HashSet<>();
+        left.retainAll((right)); // intersection
+        set.addAll(left);
+        return set.size() == 0? new ArrayList<>() : list;
+    }
+
+    // cond: 'not' cond
+    public ArrayList<Node> visitXQNot(xQueryParser.XQNotContext ctx) {
+        ArrayList<Node> res = (ArrayList<Node>) visit(ctx.cond());
+        return res.size() == 0? list : new ArrayList<>();
+    }
+
+    // cond: 'some' var 'in' xq(',' var 'in' xq)* 'satisfies' cond
+    // not very sure
+    public ArrayList<Node> visitXQSatisfy(xQueryParser.XQSatisfyContext ctx) {
+        Map<String, ArrayList<Node>> temp = textMap;
+        for (int i = 0; i < ctx.var().size(); i++) {
+            textMap.put(ctx.var(i).getText(), unique((ArrayList<Node>) visit(ctx.xq(i))));
+        }
+        ArrayList<Node> res = (ArrayList<Node>) visit(ctx.cond());
+        textMap = temp;
         return res;
     }
 }
