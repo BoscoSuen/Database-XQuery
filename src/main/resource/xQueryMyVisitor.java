@@ -336,7 +336,7 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
             e.printStackTrace();
         }
         Document doc = db.newDocument();
-        
+
         String curStr = ctx.STRINGCONSTANT().toString();
         Node newNode = doc.createTextNode(curStr);
         ArrayList<Node> res = new ArrayList<>();
@@ -410,10 +410,8 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
 
         Node newNode = doc.createElement(tagName);
         for (Node node : nodeList) {
-            if (node != null) {
-                Node deepCopy = doc.importNode(node, true);
-                newNode.appendChild(deepCopy);
-            }
+            Node deepCopy = doc.importNode(node, true);
+            newNode.appendChild(deepCopy);
         }
         ArrayList<Node> res =  new ArrayList<>();
         res.add(newNode);
@@ -516,5 +514,82 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
     @Override
     public ArrayList<Node> visitLetClause(xQueryParser.LetClauseContext ctx) {
         return null;
+    }
+
+    // cond: xq '=' xq / xq 'eq' xq
+    public ArrayList<Node> visitXQEqual(xQueryParser.XQEqualContext ctx) {
+        ArrayList<Node> temp = new ArrayList<>(list);
+        ArrayList<Node> left = (ArrayList<Node>) visit(ctx.xq(0));
+        list = temp;
+        ArrayList<Node> right = (ArrayList<Node>) visit(ctx.xq(1));
+        list = temp;
+        if (hasEqualOrSame(left, right, true)) {
+            return temp;
+        }
+        return new ArrayList<>();
+    }
+
+    // cond: xq '==' xq / xq 'is' xq
+    public ArrayList<Node> visitXQIs(xQueryParser.XQIsContext ctx) {
+        ArrayList<Node> temp = new ArrayList<>(list);
+        ArrayList<Node> left = (ArrayList<Node>) visit(ctx.xq(0));
+        list = temp;
+        ArrayList<Node> right = (ArrayList<Node>) visit(ctx.xq(1));
+        list = temp;
+        if (hasEqualOrSame(left, right, false)) {
+            return temp;
+        }
+        return new ArrayList<>();
+    }
+
+    // cond: '(' cond ')'
+    public ArrayList<Node> visitXQCond(xQueryParser.XQCondContext ctx) {
+        return (ArrayList<Node>) visit(ctx.cond());
+    }
+
+    // cond: 'empty' '(' xq ')'
+    public ArrayList<Node> visitXQIsEmpty(xQueryParser.XQIsEmptyContext ctx) {
+        ArrayList<Node> temp = new ArrayList<>(list);
+        ArrayList<Node> res = (ArrayList<Node>) visit(ctx.xq());
+        list = temp;
+        return res.size() == 0? list : new ArrayList<>();
+    }
+
+    // cond: cond 'or' cond
+    public ArrayList<Node> visitXQOrCond(xQueryParser.XQOrCondContext ctx) {
+        ArrayList<Node> left = (ArrayList<Node>) visit(ctx.cond(0));
+        ArrayList<Node> right = (ArrayList<Node>) visit(ctx.cond(1));
+        Set<Node> set = new HashSet<>();
+        set.addAll(left); // union
+        set.addAll(right);
+        return set.size() == 0? new ArrayList<>() : list;
+    }
+
+    // cond: cond 'and' cond
+    public ArrayList<Node> visitXQAndCond(xQueryParser.XQAndCondContext ctx) {
+        ArrayList<Node> left = (ArrayList<Node>) visit(ctx.cond(0));
+        ArrayList<Node> right = (ArrayList<Node>) visit(ctx.cond(1));
+        Set<Node> set = new HashSet<>();
+        left.retainAll((right)); // intersection
+        set.addAll(left);
+        return set.size() == 0? new ArrayList<>() : list;
+    }
+
+    // cond: 'not' cond
+    public ArrayList<Node> visitXQNot(xQueryParser.XQNotContext ctx) {
+        ArrayList<Node> res = (ArrayList<Node>) visit(ctx.cond());
+        return res.size() == 0? list : new ArrayList<>();
+    }
+
+    // cond: 'some' var 'in' xq(',' var 'in' xq)* 'satisfies' cond
+    // not very sure
+    public ArrayList<Node> visitXQSatisfy(xQueryParser.XQSatisfyContext ctx) {
+        Map<String, ArrayList<Node>> temp = textMap;
+        for (int i = 0; i < ctx.var().size(); i++) {
+            textMap.put(ctx.var(i).getText(), unique((ArrayList<Node>) visit(ctx.xq(i))));
+        }
+        ArrayList<Node> res = (ArrayList<Node>) visit(ctx.cond());
+        textMap = temp;
+        return res;
     }
 }
