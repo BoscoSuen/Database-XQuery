@@ -8,6 +8,7 @@ for $a in doc("j_caesar.xml")//PERSONAE, $b in $a/PERSONA
 
     return $b
 
+
 }
 
 </result>
