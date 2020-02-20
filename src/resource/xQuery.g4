@@ -52,7 +52,7 @@ xq
     | xq '/' rp                    # XQChild
     | xq '//' rp                   # XQDescendent
     | '<' NAME '>' '{' xq '}' '</' NAME '>'   # XQNodeConstrctor
-    | forClause letClause? whereClause? returnClause  # XQFLWOR
+    | forClause? letClause? whereClause? returnClause  # XQFLWOR
     | letClause xq                 # XQDefine
     ;
 
