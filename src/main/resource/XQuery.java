@@ -52,7 +52,7 @@ public class XQuery {
 
         for (Node n : list) {
             String curOutput = printNode(n);
-//            System.out.println("curOutput is: " + curOutput);
+            System.out.println("curOutput is: " + curOutput);
         }
     }
 

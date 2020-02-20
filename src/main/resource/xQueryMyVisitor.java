@@ -15,8 +15,15 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.lang.reflect.Array;
 import java.util.*;
 
@@ -336,8 +343,8 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
             e.printStackTrace();
         }
         Document doc = db.newDocument();
-
         String curStr = ctx.STRINGCONSTANT().toString();
+        curStr = curStr.substring(1,curStr.length() - 1);
         Node newNode = doc.createTextNode(curStr);
         ArrayList<Node> res = new ArrayList<>();
         res.add(newNode);
@@ -427,15 +434,21 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
         Deque<HashMap<String, Node>> deque = new LinkedList<>();  // used for BFS
         String var0 = ctx.var(0).getText();
         ArrayList<Node> list0 = (ArrayList<Node>) visit(ctx.xq(0));
+        HashMap<String, ArrayList<Node>> temp = new HashMap<>(textMap);
         for (Node n : list0) {
             HashMap<String, Node> map = new HashMap<>();
+            HashMap<String, ArrayList<Node>> mapToTextMap = new HashMap<>();
+            ArrayList<Node> listToTextMap = new ArrayList<>();
+            listToTextMap.add(n);
+            mapToTextMap.put(var0, listToTextMap);
             map.put(var0, n);
             deque.offer(map);
+            textMap.putAll(mapToTextMap);
         }
         while (!deque.isEmpty()) {
             idx++;
             int size = deque.size();
-            if (idx == ctx.var().size() - 1) {
+            if (idx == ctx.var().size()) {
                 // get all the combined map list
                 while (!deque.isEmpty()) {
                     HashMap<String, Node> curMap = deque.poll();
@@ -466,6 +479,7 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
             }
             res.add(curMap);
         }
+        textMap = temp;
         return res;
     }
 
@@ -496,10 +510,15 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
                 visit(ctx.letClause());
             }
             if (ctx.whereClause() != null) {
-                visit(ctx.whereClause());
+                ArrayList<Node> where = (ArrayList<Node>) visit(ctx.whereClause());
+                if (where.size() > 0) {
+                    res.addAll((ArrayList<Node>)visit(ctx.returnClause()));
+                }
+            }
+            else {
                 res.addAll((ArrayList<Node>)visit(ctx.returnClause()));
             }
-            res.addAll((ArrayList<Node>)visit(ctx.returnClause()));
+            textMap = temp;
         }
         textMap = temp;
         return res;
@@ -591,5 +610,18 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
         ArrayList<Node> res = (ArrayList<Node>) visit(ctx.cond());
         textMap = temp;
         return res;
+    }
+
+    private static String printNode(Node node) {
+        StringWriter stringWriter = new StringWriter();
+        try {
+            Transformer trans = TransformerFactory.newInstance().newTransformer();
+            trans.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+            trans.setOutputProperty(OutputKeys.INDENT, "yes");
+            trans.transform(new DOMSource(node), new StreamResult(stringWriter));
+        } catch (TransformerException te) {
+            System.out.println("Error in transforming node to string");
+        }
+        return stringWriter.toString();
     }
 }

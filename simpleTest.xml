@@ -1,0 +1,20 @@
+<test>
+    <note>
+        <to>Tove</to>
+        <from>Jani</from>
+        <heading>h1</heading>
+        <body>First</body>
+    </note>
+    <note>
+        <to>aaaa</to>
+        <from>oooo</from>
+        <heading>h2</heading>
+        <body>Second</body>
+    </note>
+    <note>
+        <to>bbbb</to>
+        <from>pppp</from>
+        <heading>h3</heading>
+        <body>third</body>
+    </note>
+</test>
