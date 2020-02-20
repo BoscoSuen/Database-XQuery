@@ -1,17 +1,13 @@
-<result>{  for $a in (for $s in doc("j_caesar.xml")//ACT return $s),
+<result>
 
-                     $sc in (for $t in $a/SCENE return $t),
+{
 
-                     $sp in (for $d in $sc/SPEECH return $d)
+for $a in doc("j_caesar.xml")//PERSONAE, $b in $a/PERSONA
 
-                 where $sp/LINE/text() = "Et tu, Brute! Then fall, Caesar."
+    where not (($b/text() = "JULIUS CAESAR") or ($b/text() = "Another Poet") )
 
-                 return <who>{$sp/SPEAKER/text()}</who>,
+    return $b
 
-                           <when>{
-                                           <act>{$a/TITLE/text()}</act>,
-                                           <scene>{$sc/TITLE/text()}</scene>
-                           }</when>
 }
 
 </result>

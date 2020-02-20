@@ -430,18 +430,15 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
         ArrayList<HashMap<String, ArrayList<Node>>> res = new ArrayList<>();
         int idx = 0;  // current for loop idx
         Deque<HashMap<String, Node>> deque = new LinkedList<>();  // used for BFS
-
+        HashMap<String, ArrayList<Node>> temp = new HashMap<>(textMap);
         String var0 = ctx.var(0).getText();
         ArrayList<Node> list0 = (ArrayList<Node>) visit(ctx.xq(0));
-        HashMap<String, ArrayList<Node>> temp = new HashMap<>(textMap);
         for (Node n : list0) {
             HashMap<String, Node> map = new HashMap<>();
-            ArrayList<Node> listToTextMap = new ArrayList<>();
-            listToTextMap.add(n);
             map.put(var0, n);
             deque.offer(map);
-            textMap.put(var0, listToTextMap);
         }
+//        textMap.put(var0, list0);
         while (!deque.isEmpty()) {
             idx++;
             int size = deque.size();
@@ -450,28 +447,32 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
                 while (!deque.isEmpty()) {
                     HashMap<String, Node> curMap = deque.poll();
                     combined.add(curMap);
-
                 }
+                break;
+//                System.out.println(combined.size());
             } else {
                 // combine all the variables in the next loop.
                 for (int i = 0; i < size; ++i) {
                     HashMap<String, Node> curMap = deque.poll();
                     String nextVar = ctx.var(idx).getText(); // current map bind the next var-node pairs
+//                    System.out.println(nextVar);
+                    // add curMap to textMap:
+                    for (String var : curMap.keySet()) {
+                        ArrayList<Node> subListToTextMap = new ArrayList<>();
+                        subListToTextMap.add(curMap.get(var));
+                        textMap.put(var, subListToTextMap);
+                    }
                     ArrayList<Node> nextList = (ArrayList<Node>) visit(ctx.xq(idx));
+//                    textMap.put(nextVar, nextList);
                     for (Node n : nextList) {
                         HashMap<String, Node> map = new HashMap<>(curMap);
                         map.put(nextVar, n);
                         deque.offer(map);
-                        // add curMap to textMap:
-                        for (String var : map.keySet()) {
-                            ArrayList<Node> listToTextMap = new ArrayList<>();
-                            listToTextMap.add(map.get(var));
-                            textMap.put(var, listToTextMap);
-                        }
                     }
                 }
             }
         }
+        textMap = temp;
         // now we get all the combined map list,
         // we have to convert the node to list of node to match the var query
         for (HashMap<String, Node> map : combined) {
@@ -483,7 +484,7 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
             }
             res.add(curMap);
         }
-        textMap = temp;
+
         return res;
     }
 
