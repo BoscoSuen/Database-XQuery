@@ -9,7 +9,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -24,7 +23,6 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.lang.reflect.Array;
 import java.util.*;
 
 public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
@@ -366,14 +364,14 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
     @Override
     // xq: xq , xq
     public ArrayList<Node> visitXQConcat(xQueryParser.XQConcatContext ctx) {
-        HashMap<String, ArrayList<Node>> tt = new HashMap<>(textMap);
+        HashMap<String, ArrayList<Node>> temp = new HashMap<>(textMap);
         ArrayList<Node> res = new ArrayList<>();
         ArrayList<Node> left = (ArrayList<Node>) visit(ctx.xq(0));
-        textMap = tt;
+        textMap = temp;
         ArrayList<Node> right = (ArrayList<Node>) visit(ctx.xq(1));
-        res.addAll(right);
         res.addAll(left);
-        textMap = tt;
+        res.addAll(right);
+        textMap = temp;
         return unique(res);
     }
 
@@ -426,65 +424,7 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
     @Override
     // xq: forClause
     public ArrayList<HashMap<String, ArrayList<Node>>> visitForClause(xQueryParser.ForClauseContext ctx) {
-        ArrayList<HashMap<String, Node>> combined = new ArrayList<>();
-        ArrayList<HashMap<String, ArrayList<Node>>> res = new ArrayList<>();
-        int idx = 0;  // current for loop idx
-        Deque<HashMap<String, Node>> deque = new LinkedList<>();  // used for BFS
-
-        String var0 = ctx.var(0).getText();
-        ArrayList<Node> list0 = (ArrayList<Node>) visit(ctx.xq(0));
-        HashMap<String, ArrayList<Node>> temp = new HashMap<>(textMap);
-        for (Node n : list0) {
-            HashMap<String, Node> map = new HashMap<>();
-            ArrayList<Node> listToTextMap = new ArrayList<>();
-            listToTextMap.add(n);
-            map.put(var0, n);
-            deque.offer(map);
-            textMap.put(var0, listToTextMap);
-        }
-        while (!deque.isEmpty()) {
-            idx++;
-            int size = deque.size();
-            if (idx == ctx.var().size()) {
-                // get all the combined map list
-                while (!deque.isEmpty()) {
-                    HashMap<String, Node> curMap = deque.poll();
-                    combined.add(curMap);
-
-                }
-            } else {
-                // combine all the variables in the next loop.
-                for (int i = 0; i < size; ++i) {
-                    HashMap<String, Node> curMap = deque.poll();
-                    String nextVar = ctx.var(idx).getText(); // current map bind the next var-node pairs
-                    ArrayList<Node> nextList = (ArrayList<Node>) visit(ctx.xq(idx));
-                    for (Node n : nextList) {
-                        HashMap<String, Node> map = new HashMap<>(curMap);
-                        map.put(nextVar, n);
-                        deque.offer(map);
-                        // add curMap to textMap:
-                        for (String var : map.keySet()) {
-                            ArrayList<Node> listToTextMap = new ArrayList<>();
-                            listToTextMap.add(map.get(var));
-                            textMap.put(var, listToTextMap);
-                        }
-                    }
-                }
-            }
-        }
-        // now we get all the combined map list,
-        // we have to convert the node to list of node to match the var query
-        for (HashMap<String, Node> map : combined) {
-            HashMap<String, ArrayList<Node>> curMap = new HashMap<>();
-            for (String var : map.keySet()) {
-                ArrayList<Node> nodeList = new ArrayList<>();
-                nodeList.add(map.get(var));
-                curMap.put(var, nodeList);
-            }
-            res.add(curMap);
-        }
-        textMap = temp;
-        return res;
+        return null;
     }
 
     @Override
@@ -502,41 +442,56 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
     @Override
     // xq: forClause letClause? whereClause? returnClause  # XQFLWOR
     public ArrayList<Node> visitXQFLWOR(xQueryParser.XQFLWORContext ctx) {
-        ArrayList<Node> res = new ArrayList<>();
-        if (ctx.forClause() == null) {
-            return res;
-        }
-        ArrayList<HashMap<String, ArrayList<Node>>> combinedList = (ArrayList<HashMap<String, ArrayList<Node>>>) visit(ctx.forClause());
         HashMap<String, ArrayList<Node>> temp = new HashMap<>(textMap);
-        for (HashMap<String, ArrayList<Node>> map : combinedList) {
-            textMap.putAll(map); // the current query map cover the original text map
+        ArrayList<Node> result = new ArrayList<>();
+        dfs(ctx, 0, result);
+        textMap = temp;
+        return result;
+    }
+
+    private void dfs(xQueryParser.XQFLWORContext ctx, int i, ArrayList<Node> res) {
+        if (i == ctx.forClause().var().size()) {
             if (ctx.letClause() != null) {
                 visit(ctx.letClause());
             }
             if (ctx.whereClause() != null) {
-                ArrayList<Node> where = (ArrayList<Node>) visit(ctx.whereClause());
-                if (where.size() > 0) {
+                ArrayList<Node> whereRes = (ArrayList<Node>) visit(ctx.whereClause());
+                if (whereRes.size() > 0) {
                     res.addAll((ArrayList<Node>)visit(ctx.returnClause()));
                 }
             }
             else {
                 res.addAll((ArrayList<Node>)visit(ctx.returnClause()));
             }
+            return;
+        }
+        ArrayList<Node> nodeList = (ArrayList<Node>) visit(ctx.forClause().xq(i));
+        for (Node node : nodeList){
+            HashMap<String, ArrayList<Node>> temp = new HashMap<>(textMap);
+            ArrayList<Node> result = new ArrayList<>();
+            result.add(node);
+            textMap.put(ctx.forClause().var(i).getText(), result);
+            dfs(ctx, i + 1, res);
             textMap = temp;
         }
-        textMap = temp;
-        return res;
     }
 
     @Override
     // xq: letClause xq
     public ArrayList<Node> visitXQDefine(xQueryParser.XQDefineContext ctx) {
-        return null;
+        HashMap<String, ArrayList<Node>> temp = new HashMap<>(textMap);
+        visit(ctx.letClause());
+        ArrayList<Node> result = (ArrayList<Node>) visit(ctx.xq());
+        textMap = temp;
+        return result;
     }
 
     @Override
     public ArrayList<Node> visitLetClause(xQueryParser.LetClauseContext ctx) {
-        return null;
+        for (int i = 0; i < ctx.var().size(); i++) {
+            textMap.put(ctx.var(i).NAME().getText(), (ArrayList<Node>) visit(ctx.xq(i)));
+        }
+        return list;
     }
 
     // cond: xq '=' xq / xq 'eq' xq
@@ -547,7 +502,6 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
         ArrayList<Node> right = (ArrayList<Node>) visit(ctx.xq(1));
         list = temp;
         if (hasEqualOrSame(left, right, true)) {
-            // System.out.println(temp);
             return temp;
         }
         return new ArrayList<>();
@@ -608,7 +562,7 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
     // cond: 'some' var 'in' xq(',' var 'in' xq)* 'satisfies' cond
     // not very sure
     public ArrayList<Node> visitXQSatisfy(xQueryParser.XQSatisfyContext ctx) {
-        Map<String, ArrayList<Node>> temp = textMap;
+        Map<String, ArrayList<Node>> temp = new HashMap<>(textMap);
         for (int i = 0; i < ctx.var().size(); i++) {
             textMap.put(ctx.var(i).getText(), unique((ArrayList<Node>) visit(ctx.xq(i))));
         }
