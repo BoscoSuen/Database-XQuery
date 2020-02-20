@@ -5,6 +5,7 @@
 package main.resource;
 
 import jdk.nashorn.internal.runtime.arrays.ArrayLikeIterator;
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -432,18 +433,17 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
         ArrayList<HashMap<String, ArrayList<Node>>> res = new ArrayList<>();
         int idx = 0;  // current for loop idx
         Deque<HashMap<String, Node>> deque = new LinkedList<>();  // used for BFS
+
         String var0 = ctx.var(0).getText();
         ArrayList<Node> list0 = (ArrayList<Node>) visit(ctx.xq(0));
         HashMap<String, ArrayList<Node>> temp = new HashMap<>(textMap);
         for (Node n : list0) {
             HashMap<String, Node> map = new HashMap<>();
-            HashMap<String, ArrayList<Node>> mapToTextMap = new HashMap<>();
             ArrayList<Node> listToTextMap = new ArrayList<>();
             listToTextMap.add(n);
-            mapToTextMap.put(var0, listToTextMap);
             map.put(var0, n);
             deque.offer(map);
-            textMap.putAll(mapToTextMap);
+            textMap.put(var0, listToTextMap);
         }
         while (!deque.isEmpty()) {
             idx++;
@@ -453,6 +453,7 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
                 while (!deque.isEmpty()) {
                     HashMap<String, Node> curMap = deque.poll();
                     combined.add(curMap);
+
                 }
             } else {
                 // combine all the variables in the next loop.
@@ -464,6 +465,12 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
                         HashMap<String, Node> map = new HashMap<>(curMap);
                         map.put(nextVar, n);
                         deque.offer(map);
+                        // add curMap to textMap:
+                        for (String var : map.keySet()) {
+                            ArrayList<Node> listToTextMap = new ArrayList<>();
+                            listToTextMap.add(map.get(var));
+                            textMap.put(var, listToTextMap);
+                        }
                     }
                 }
             }
