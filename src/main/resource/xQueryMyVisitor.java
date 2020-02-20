@@ -4,8 +4,7 @@
 
 package main.resource;
 
-import jdk.nashorn.internal.runtime.arrays.ArrayLikeIterator;
-import org.antlr.v4.runtime.tree.ParseTree;
+// import jdk.nashorn.internal.runtime.arrays.ArrayLikeIterator;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -345,7 +344,7 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
         }
         Document doc = db.newDocument();
         String curStr = ctx.STRINGCONSTANT().toString();
-        curStr = curStr.substring(1,curStr.length() - 1);
+        curStr = curStr.substring(1, curStr.length() - 1);
         Node newNode = doc.createTextNode(curStr);
         ArrayList<Node> res = new ArrayList<>();
         res.add(newNode);
@@ -367,17 +366,15 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
     @Override
     // xq: xq , xq
     public ArrayList<Node> visitXQConcat(xQueryParser.XQConcatContext ctx) {
+        HashMap<String, ArrayList<Node>> tt = new HashMap<>(textMap);
         ArrayList<Node> res = new ArrayList<>();
-        ArrayList<Node> temp = new ArrayList<>(list);
-        visit(ctx.xq(0));
-        ArrayList<Node> left = new ArrayList<>(list);
-        list = temp;
-        visit(ctx.xq(1));
-        List<Node> right = new ArrayList<>(list);
-        res.addAll(left);
+        ArrayList<Node> left = (ArrayList<Node>) visit(ctx.xq(0));
+        textMap = tt;
+        ArrayList<Node> right = (ArrayList<Node>) visit(ctx.xq(1));
         res.addAll(right);
-        list = unique(res);
-        return res;
+        res.addAll(left);
+        textMap = tt;
+        return unique(res);
     }
 
     @Override
@@ -550,6 +547,7 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
         ArrayList<Node> right = (ArrayList<Node>) visit(ctx.xq(1));
         list = temp;
         if (hasEqualOrSame(left, right, true)) {
+            // System.out.println(temp);
             return temp;
         }
         return new ArrayList<>();
