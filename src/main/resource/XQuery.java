@@ -32,7 +32,7 @@ public class XQuery {
         StringBuffer sb = new StringBuffer();
         String str = null;
         while ((str = bufferedReader.readLine()) != null) {
-            sb.append(str);
+            sb.append(" ").append(str);
         }
         String stringBuffer = sb.toString();
 //        System.out.println("Query String is: " + stringBuffer);
