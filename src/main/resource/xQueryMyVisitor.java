@@ -489,7 +489,7 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
     @Override
     public ArrayList<Node> visitLetClause(xQueryParser.LetClauseContext ctx) {
         for (int i = 0; i < ctx.var().size(); i++) {
-            textMap.put(ctx.var(i).NAME().getText(), (ArrayList<Node>) visit(ctx.xq(i)));
+            textMap.put(ctx.var(i).getText(), (ArrayList<Node>) visit(ctx.xq(i)));
         }
         return list;
     }
