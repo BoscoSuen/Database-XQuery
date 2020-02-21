@@ -532,12 +532,19 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
     @Override
     // xq: letClause xq
     public ArrayList<Node> visitXQDefine(xQueryParser.XQDefineContext ctx) {
-        return null;
+        HashMap<String, ArrayList<Node>> temp = new HashMap<>(textMap);
+        visit(ctx.letClause());
+        ArrayList<Node> result = (ArrayList<Node>) visit(ctx.xq());
+        textMap = temp;
+        return result;
     }
 
     @Override
     public ArrayList<Node> visitLetClause(xQueryParser.LetClauseContext ctx) {
-        return null;
+        for (int i = 0; i < ctx.var().size(); i++) {
+            textMap.put(ctx.var(i).getText(), (ArrayList<Node>) visit(ctx.xq(i)));
+        }
+        return list;
     }
 
     // cond: xq '=' xq / xq 'eq' xq
