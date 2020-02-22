@@ -25,9 +25,9 @@ import java.util.ArrayList;
 public class XPath {
 
     public static void main(String[] args) throws IOException {
-        File inputFile = new File("test.txt");
+        File inputFile = new File("XPathTest.txt");
         if (!inputFile.isFile() || !inputFile.exists()) return;
-        File outputFile = new File("output.txt");
+        File outputFile = new File("XPathOutput.txt");
         if (!outputFile.exists()) outputFile.createNewFile(); // create output file
 
         FileInputStream fileInputStream = new FileInputStream(inputFile);
@@ -60,7 +60,7 @@ public class XPath {
             fileOutputStream.write(("-------------------------------------------------\n").getBytes());
             idx++;
         }
-        System.out.println("Get the query output file in \"output.txt\":");
+        System.out.println("Get the query output file in \"XPathOutput.txt\":");
         fileOutputStream.flush();
         fileOutputStream.close();
     }
