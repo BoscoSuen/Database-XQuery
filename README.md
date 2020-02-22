@@ -7,7 +7,7 @@ This is the project for UCSD CSE232B [Database Systems: Advanced Topics and Impl
 * [About the Project](#about-the-project)
   * [Milestone1](#Milestone1)
   * [Milestone2](#Milestone2)
-  * [Milestone2](#Milestone2)
+  * [Milestone3](#Milestone3)
   * [Reference](#Reference)
 * [Getting Started](#getting-started)
   * [Environment](#Environment)
