@@ -2,7 +2,7 @@
 
 This is the project for UCSD CSE232B [Database Systems: Advanced Topics and Implementation](https://cseweb.ucsd.edu/classes/wi20/cse232B-a/)
 
-## able of Contents
+## Table of Contents
 
 * [About the Project](#about-the-project)
   * [Milestone1](#Milestone1)
