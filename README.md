@@ -91,11 +91,8 @@ To install the prerequisite environment, you can follow the following help links
 
 ## Contributing
 
-[![Zhiqiang Sun][contributors-shield]][Zhiqiang-url]
-
-[![Xiaohan Zhu][contributors-shield]][Xiaohan-url]
-
-
+* Zhiqiang Sun [![LinkedIn][linkedin-shield]][Zhiqiang-url]
+* Xiaohan Zhu [![LinkedIn][linkedin-shield]][Xiaohan-url]
 
 
 
@@ -103,6 +100,7 @@ To install the prerequisite environment, you can follow the following help links
 
 <!-- LINKS -->
 
-[Zhiqiang-url]:https://www.linkedin.com/in/zhiqiang-sun/
+[linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=flat-square&logo=linkedin&colorB=555
+[Zhiqiang-url]: https://www.linkedin.com/in/zhiqiang-sun/
 [Xiaohan-url]: https://www.linkedin.com/in/xh-zhu/
 
