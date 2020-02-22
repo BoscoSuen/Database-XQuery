@@ -2,7 +2,7 @@
 
 This is the project for UCSD CSE232B [Database Systems: Advanced Topics and Implementation](https://cseweb.ucsd.edu/classes/wi20/cse232B-a/)
 
-##Table of Contents
+## able of Contents
 
 * [About the Project](#about-the-project)
   * [Milestone1](#Milestone1)
@@ -17,7 +17,7 @@ This is the project for UCSD CSE232B [Database Systems: Advanced Topics and Impl
 
 
 
-##About the Project
+## About the Project
 
 This project is the construction of an XQuery processor. We consider a subset/modification of XML’s data model, XQuery, and XQuery’s type system as described in [this note](https://cseweb.ucsd.edu/classes/wi20/cse232B-a/notes/xpath-semantics.pdf). The processor receives an XQuery, parses it into an abstract tree representation, optimizes it and finally executes the optimized plan.
 
