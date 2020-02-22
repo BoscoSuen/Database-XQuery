@@ -71,19 +71,23 @@ To install the prerequisite environment, you can follow the following help links
 
 ## Usage
 
-* Initialize the project:
+* ***Initialize the project***:
 
   After you down the project, you can open your IDE and install all the dependencies in the project by
 
   `mvn install`
 
-  If you are an Intellij IDEA user, you need to enable your ANTLR v4 plugin.
+  If you are an Intellij IDEA user, you need to enable your [ANTLR v4 grammar plugin](https://plugins.jetbrains.com/plugin/7358-antlr-v4-grammar-plugin).
 
-* XPath
+  Also, in IDEA, if you have previously add .iml module, you need to delete it and import a new module:
+
+  `mvn idea:module`
+
+* ***XPath***
 
   In your home directory, you need to use **"XPathTest.txt"** file to input your XPath query. You can write all your input line by line. After that, you can just run the **"XPath.java"** and in the command output, you can get the number of nodes found in the query, and in the file **"XPathOutput.txt**, you can get all the nodes of your XPath queries.
 
-* XQuery
+* ***XQuery***
 
   In your home directory, you need to use **"XQueryTest.txt"** file to input your Query query. You can write all your input query sentence line by line, but you can **only input one query once in the input file**, if you have more than one query, you need erase all your previous input in the input file and reinput. After the input file get your input query, you can run the **"Query.java"** and in the command output, you can get the number of nodes found in the query(The nodes can be queried or created). And moreover, it will also show the nodes found in your Query query.
 
