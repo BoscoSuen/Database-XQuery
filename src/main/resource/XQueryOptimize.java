@@ -1,7 +1,3 @@
-/**
- * Created by Xiaohan Zhu and Zhiqiang Sun
- */
-
 package main.resource;
 
 import org.antlr.v4.runtime.CharStream;
@@ -19,8 +15,7 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 import java.util.ArrayList;
 
-public class XQuery {
-
+public class XQueryOptimize {
     public static void main(String[] args) throws IOException {
 //        use file reader:
         File inputFile = new File("XQueryTest.txt");
@@ -33,20 +28,36 @@ public class XQuery {
         while ((str = bufferedReader.readLine()) != null) {
             sb.append(" ").append(str);
         }
-        String stringBuffer = sb.toString();
+        String inputQuery = sb.toString();
 //        System.out.println("Query String is: " + stringBuffer);
-        CharStream input = CharStreams.fromString(stringBuffer);
 
-//        use ANTLRInputStream:
-//        ANTLRInputStream input = new ANTLRInputStream(System.in);
-
-
+        CharStream input = CharStreams.fromString(inputQuery);
         xQueryLexer lexer = new xQueryLexer(input);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         xQueryParser parser = new xQueryParser(tokens);
         ParseTree parseTree = parser.xq();
+
+        // TODO: rewrite the query parse tree
+        String queryRewritten = rewrite(parseTree);
+        if (queryRewritten.length() == 0) queryRewritten = inputQuery;
+        else {
+            // rewrite the query and save the query format
+            File outputFile = new File("OptimizedQuery.txt");
+            FileOutputStream fileOutputStream = new FileOutputStream(outputFile);
+            BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(fileOutputStream));
+            bufferedWriter.write(queryRewritten);
+            bufferedWriter.close();
+            fileOutputStream.close();
+        }
+
+        CharStream rewrittenInput = CharStreams.fromString(queryRewritten);
+        xQueryLexer rewrittenLexer = new xQueryLexer(rewrittenInput);
+        CommonTokenStream rewrittenTokens = new CommonTokenStream(rewrittenLexer);
+        xQueryParser rewrittenParser = new xQueryParser(rewrittenTokens);
+        ParseTree rewrittenParseTree = rewrittenParser.xq();
+
         xQueryMyVisitor visitor = new xQueryMyVisitor();
-        ArrayList<Node> list = (ArrayList<Node>) visitor.visit(parseTree);
+        ArrayList<Node> list = (ArrayList<Node>) visitor.visit(rewrittenParseTree);
         System.out.println("Number of nodes found: " + list.size());
 
         for (Node n : list) {
@@ -55,8 +66,12 @@ public class XQuery {
         }
     }
 
-    // Transform node to printable string
-    // Reference: https://stackoverflow.com/questions/4412848/xml-node-to-string-in-java
+
+    public static String rewrite(ParseTree parseTree) {
+        
+    }
+
+
     private static String printNode(Node node) {
         StringWriter stringWriter = new StringWriter();
         try {

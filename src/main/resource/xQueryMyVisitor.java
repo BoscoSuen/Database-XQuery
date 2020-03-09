@@ -9,7 +9,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -24,7 +23,6 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.lang.reflect.Array;
 import java.util.*;
 
 public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
@@ -632,7 +630,15 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
     // join clause
     @Override
     public ArrayList<Node> visitXQJoin(xQueryParser.XQJoinContext ctx) {
-        return null;
+        return (ArrayList<Node>)visit(ctx.joinClause());
+    }
+
+    @Override public ArrayList<Node> visitJoinClause(xQueryParser.JoinClauseContext ctx) {
+        ArrayList<Node> res = new ArrayList<>();
+        ArrayList<Node> xq0 = (ArrayList<Node>) visit(ctx.xq(0));
+        ArrayList<Node> xq1 = (ArrayList<Node>) visit(ctx.xq(1));
+
+        return res;
     }
 
 
