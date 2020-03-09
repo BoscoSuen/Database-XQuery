@@ -292,6 +292,18 @@ public class xQueryBaseListener implements xQueryListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterXQJoin(xQueryParser.XQJoinContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitXQJoin(xQueryParser.XQJoinContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterXQAp(xQueryParser.XQApContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -539,6 +551,30 @@ public class xQueryBaseListener implements xQueryListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitReturnClause(xQueryParser.ReturnClauseContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterJoinClause(xQueryParser.JoinClauseContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitJoinClause(xQueryParser.JoinClauseContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterAttrList(xQueryParser.AttrListContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitAttrList(xQueryParser.AttrListContext ctx) { }
 
 	/**
 	 * {@inheritDoc}

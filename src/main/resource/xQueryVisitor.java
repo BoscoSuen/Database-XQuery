@@ -170,6 +170,13 @@ public interface xQueryVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitXQFLWOR(xQueryParser.XQFLWORContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code XQJoin}
+	 * labeled alternative in {@link xQueryParser#xq}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitXQJoin(xQueryParser.XQJoinContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code XQAp}
 	 * labeled alternative in {@link xQueryParser#xq}.
 	 * @param ctx the parse tree
@@ -312,4 +319,16 @@ public interface xQueryVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitReturnClause(xQueryParser.ReturnClauseContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link xQueryParser#joinClause}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitJoinClause(xQueryParser.JoinClauseContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link xQueryParser#attrList}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitAttrList(xQueryParser.AttrListContext ctx);
 }

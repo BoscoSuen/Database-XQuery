@@ -54,7 +54,7 @@ xq
     | '<' NAME '>' '{' xq '}' '</' NAME '>'   # XQNodeConstrctor
     | forClause? letClause? whereClause? returnClause  # XQFLWOR
     | letClause xq                 # XQDefine
-    | joinClause                   # Join
+    | joinClause                   # XQJoin
     ;
 
 forClause
@@ -87,7 +87,11 @@ returnClause
     ;
 
 joinClause
-    : 'join' '(' xq ',' xq ',' '[' (NAME)? (',' NAME)* ']' ',' '[' (NAME)? (',' NAME)* ']' ')'
+    : 'join' '(' xq ',' xq ',' attrList ',' attrList ')'
+    ;
+
+attrList
+    : '[' (NAME (',' NAME)*)? ']'
     ;
 
 

@@ -629,6 +629,15 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
         return res;
     }
 
+    // join clause
+    @Override
+    public ArrayList<Node> visitXQJoin(xQueryParser.XQJoinContext ctx) {
+        return null;
+    }
+
+
+
+
     private static String printNode(Node node) {
         StringWriter stringWriter = new StringWriter();
         try {
