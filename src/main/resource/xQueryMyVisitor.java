@@ -391,7 +391,7 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
         Queue<Node> queue = new LinkedList<>(list);
         ArrayList<Node> res = new ArrayList<>(list);
         getDesOrSelf(res, queue);
-        list = unique(list);
+        list = res;
         visit(ctx.rp());
         return unique(list);
     }
@@ -567,7 +567,8 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
     public ArrayList<Node> visitXQSatisfy(xQueryParser.XQSatisfyContext ctx) {
         Map<String, ArrayList<Node>> temp = new HashMap<>(textMap);
         for (int i = 0; i < ctx.var().size(); i++) {
-            textMap.put(ctx.var(i).getText(), (ArrayList<Node>) visit(ctx.xq(i)));
+            ArrayList<Node> nodeList = (ArrayList<Node>) visit(ctx.xq(i));
+            textMap.put(ctx.var(i).getText(), nodeList);
         }
         ArrayList<Node> res = (ArrayList<Node>) visit(ctx.cond());
         textMap = temp;
