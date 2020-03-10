@@ -13,9 +13,17 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
-import java.util.ArrayList;
+import java.util.*;
 
 public class XQueryOptimize {
+    Map<String, String> var2xq = new HashMap<>();
+    Map<String, String> var2root = new HashMap<>();
+    Map<String, HashSet<String>> root2child = new HashMap<>();
+    ArrayList<String[]> pairs = new ArrayList<>();
+    Map<String, String> root2where = new HashMap<>();
+    Map<String, String> root2join = new HashMap<>();
+
+
     public static void main(String[] args) throws IOException {
 //        use file reader:
         File inputFile = new File("XQueryTest.txt");
@@ -66,9 +74,19 @@ public class XQueryOptimize {
         }
     }
 
+    public static boolean needRewrite(ParseTree parseTree) {
+
+    }
+
 
     public static String rewrite(ParseTree parseTree) {
-        
+        if (!needRewrite(parseTree)) return "";
+        ParseTree forClause = parseTree.getChild(0);
+        ParseTree whereClause = parseTree.getChild(1);
+        ParseTree returnClause = parseTree.getChild(2);
+
+
+
     }
 
 
