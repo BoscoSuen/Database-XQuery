@@ -637,7 +637,7 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
         ArrayList<Node> res = new ArrayList<>();
         ArrayList<Node> xq0 = (ArrayList<Node>) visit(ctx.xq(0));
         ArrayList<Node> xq1 = (ArrayList<Node>) visit(ctx.xq(1));
-
+        System.out.println("here");
         return res;
     }
 

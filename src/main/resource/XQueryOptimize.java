@@ -69,7 +69,7 @@ public class XQueryOptimize {
         while ((str_new = reBufferedReader.readLine()) != null) {
             sb_new.append(" ").append(str_new);
         }
-        String reInputQuery = sb.toString();
+        String reInputQuery = sb_new.toString();
 
         CharStream rewrittenInput = CharStreams.fromString(reInputQuery);
         xQueryLexer rewrittenLexer = new xQueryLexer(rewrittenInput);
@@ -78,13 +78,13 @@ public class XQueryOptimize {
         ParseTree rewrittenParseTree = rewrittenParser.xq();
 
         xQueryMyVisitor visitor = new xQueryMyVisitor();
-//        ArrayList<Node> list = (ArrayList<Node>) visitor.visit(rewrittenParseTree);
-//        System.out.println("Number of nodes found: " + list.size());
-//
-//        for (Node n : list) {
-//            String curOutput = printNode(n);
-//            System.out.println("curOutput is:\n" + curOutput);
-//        }
+        ArrayList<Node> list = (ArrayList<Node>) visitor.visit(rewrittenParseTree);
+        System.out.println("Number of nodes found: " + list.size());
+
+        for (Node n : list) {
+            String curOutput = printNode(n);
+            System.out.println("curOutput is:\n" + curOutput);
+        }
     }
 
     public static void parsingForClause(ParseTree forClause) {
