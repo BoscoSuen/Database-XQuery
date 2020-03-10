@@ -16,13 +16,12 @@ import java.io.*;
 import java.util.*;
 
 public class XQueryOptimize {
-    Map<String, String> var2xq = new HashMap<>();
-    Map<String, String> var2root = new HashMap<>();
-    Map<String, HashSet<String>> root2child = new HashMap<>();
-    ArrayList<String[]> pairs = new ArrayList<>();
-    Map<String, String> root2where = new HashMap<>();
-    Map<String, String> root2join = new HashMap<>();
-
+    static Map<String, String> var2xq = new HashMap<>();
+    static Map<String, String> var2root = new HashMap<>();
+    static Map<String, ArrayList<String>> root2child = new HashMap<>();
+    static ArrayList<String[]> pairs = new ArrayList<>();
+    static Map<String, String> root2where = new HashMap<>();
+    static Map<String, String> root2join = new HashMap<>();
 
     public static void main(String[] args) throws IOException {
 //        use file reader:
@@ -74,8 +73,78 @@ public class XQueryOptimize {
         }
     }
 
-    public static boolean needRewrite(ParseTree parseTree) {
+    public static void parsingForClause(ParseTree forClause) {
+        for (int i = 1; i < forClause.getChildCount(); i += 4) {
+            String currVar = trimVarString(forClause.getChild(i).getText());
+            String xq = forClause.getChild(i + 2).getText();
+            var2xq.put(currVar, xq);
+            String rootVar;
+            if (xq.startsWith("doc")) {
+                rootVar = currVar;
+            } else {
+                int varEnd = xq.indexOf("/") > -1? xq.indexOf("/") : xq.length();
+                rootVar = var2root.get(xq.substring(1, varEnd));
+            }
+            var2root.put(currVar, rootVar);
+            ArrayList<String> childrenList = root2child.getOrDefault(rootVar, new ArrayList<>());
+            if (!xq.startsWith("doc")) {
+                childrenList.add(currVar);
+            }
+            root2child.put(rootVar, childrenList);
+        }
+    }
 
+    public static void parsingWhereClause(ParseTree allCond) {
+        List<String> condList = Arrays.asList(allCond.getText().split("and"));
+        for (String cond : condList) {
+            String[] vars = cond.split(cond.contains("eq")? "eq" : "=");
+            pairs.add(new String[]{trimVarString(vars[0]), trimVarString(vars[1])});
+        }
+    }
+
+    public static String trimVarString(String input) {
+        return input.substring(input.indexOf("$") + 1).trim();
+    }
+
+    public static String completeVarString(String input) {
+        return input.startsWith("\"")? input : "$" + input;
+    }
+
+    public static boolean needRewrite(ParseTree parseTree) {
+        ParseTree forClause = parseTree.getChild(0);
+        ParseTree whereClause = parseTree.getChild(1);
+
+        String forClauseText = forClause.getText();
+        if (forClauseText.contains("join") || !forClauseText.contains("for")) {
+            return false;
+        }
+        parsingForClause(forClause);
+        parsingWhereClause(whereClause.getChild(1));
+//        for (Map.Entry<String, String> e : var2root.entrySet()) {
+//            System.out.println(e.getKey() + "," + e.getValue());
+//        }
+//        for (Map.Entry<String, String> e : var2root.entrySet()) {
+//            System.out.println(e.getKey() + "," + e.getValue());
+//        }
+        boolean flag = false;
+        for (String[] pair : pairs) {
+            // System.out.println(pair[0] + "," + pair[1]);
+            String where1 = pair[0];
+            String where2 = pair[1];
+            String where1Root = where1.startsWith("\"")? "" : var2root.get(where1);
+            String where2Root = where2.startsWith("\"")? "" : var2root.get(where2);
+            if (!where1.startsWith("\"") && !where2.startsWith("\"") && !where2Root.equals(where1Root)) {
+                flag = true;
+                continue;
+            }
+            String toAdd = completeVarString(where1) + " eq " + completeVarString(where2);
+            toAdd = root2where.containsKey(where1Root) ? " and " + toAdd : "where " + toAdd;
+            root2where.put(where1Root, root2where.getOrDefault(where1Root, "") + toAdd);
+        }
+        for (Map.Entry<String, String> e : root2where.entrySet()) {
+            System.out.println(e.getKey() + "," + e.getValue());
+        }
+        return flag;
     }
 
 
