@@ -47,8 +47,7 @@ public class XQueryOptimize {
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         xQueryParser parser = new xQueryParser(tokens);
         ParseTree parseTree = parser.xq();
-
-        // TODO: rewrite the query parse tree
+        
         String queryRewritten = rewrite(parseTree);
         if (queryRewritten.length() == 0) queryRewritten = inputQuery;
         else {
@@ -61,7 +60,18 @@ public class XQueryOptimize {
             fileOutputStream.close();
         }
 
-        CharStream rewrittenInput = CharStreams.fromString(queryRewritten);
+        File reInputFile = new File("OptimizedQuery.txt");
+        FileInputStream fileReinputStream = new FileInputStream(reInputFile);
+        InputStreamReader reInputStreamReader = new InputStreamReader(fileReinputStream);
+        BufferedReader reBufferedReader = new BufferedReader(reInputStreamReader);
+        StringBuffer sb_new = new StringBuffer();
+        String str_new = null;
+        while ((str_new = reBufferedReader.readLine()) != null) {
+            sb_new.append(" ").append(str_new);
+        }
+        String reInputQuery = sb.toString();
+
+        CharStream rewrittenInput = CharStreams.fromString(reInputQuery);
         xQueryLexer rewrittenLexer = new xQueryLexer(rewrittenInput);
         CommonTokenStream rewrittenTokens = new CommonTokenStream(rewrittenLexer);
         xQueryParser rewrittenParser = new xQueryParser(rewrittenTokens);
