@@ -1,0 +1,65 @@
+$tuple in join (
+join (
+for $b1 in doc("input")/book, 
+$aj in $b1/author/first/text(), 
+$a1 in $b1/author, 
+$af1 in $a1/first, 
+$al1 in $a1/last
+where $aj eq "John"
+return <tuple> {
+	<b1> {$b1} </b1>, 
+	<aj> {$aj} </aj>, 
+	<a1> {$a1} </a1>, 
+	<af1> {$af1} </af1>, 
+	<al1> {$al1} </al1>	}</tuple>
+,
+for $b1 in doc("input")/book, 
+$aj in $b1/author/first/text(), 
+$a1 in $b1/author, 
+$af1 in $a1/first, 
+$al1 in $a1/last
+where $aj eq "John"
+return <tuple> {
+	<b1> {$b1} </b1>, 
+	<aj> {$aj} </aj>, 
+	<a1> {$a1} </a1>, 
+	<af1> {$af1} </af1>, 
+	<al1> {$al1} </al1>	}</tuple>
+,
+[af1, al1],
+[af21, al21] )
+,
+join (
+for $b1 in doc("input")/book, 
+$aj in $b1/author/first/text(), 
+$a1 in $b1/author, 
+$af1 in $a1/first, 
+$al1 in $a1/last
+where $aj eq "John"
+return <tuple> {
+	<b1> {$b1} </b1>, 
+	<aj> {$aj} </aj>, 
+	<a1> {$a1} </a1>, 
+	<af1> {$af1} </af1>, 
+	<al1> {$al1} </al1>	}</tuple>
+,
+for $b1 in doc("input")/book, 
+$aj in $b1/author/first/text(), 
+$a1 in $b1/author, 
+$af1 in $a1/first, 
+$al1 in $a1/last
+where $aj eq "John"
+return <tuple> {
+	<b1> {$b1} </b1>, 
+	<aj> {$aj} </aj>, 
+	<a1> {$a1} </a1>, 
+	<af1> {$af1} </af1>, 
+	<al1> {$al1} </al1>	}</tuple>
+,
+[af1, al1],
+[af21, al21] )
+,
+[af22, al22],
+[af3, al3] )
+
+return<triplet>{null//*b1,null//*b2,null//*b3}</triplet>
