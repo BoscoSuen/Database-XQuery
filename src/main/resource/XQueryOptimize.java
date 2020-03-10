@@ -15,13 +15,14 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 import java.util.*;
 
+
 public class XQueryOptimize {
-    Map<String, String> var2xq = new HashMap<>();
-    Map<String, String> var2root = new HashMap<>();
-    Map<String, HashSet<String>> root2child = new HashMap<>();
-    ArrayList<String[]> pairs = new ArrayList<>();
-    Map<String, String> root2where = new HashMap<>();
-    Map<String, String> root2join = new HashMap<>();
+    static Map<String, String> var2xq = new HashMap<>();
+    static Map<String, String> var2root = new HashMap<>();
+    static Map<String, ArrayList<String>> root2child = new HashMap<>();
+    static ArrayList<String[]> pairs = new ArrayList<>();
+    static Map<String, String> root2where = new HashMap<>();
+    static Map<String, String> root2join = new HashMap<>();
 
 
     public static void main(String[] args) throws IOException {
@@ -81,13 +82,108 @@ public class XQueryOptimize {
 
     public static String rewrite(ParseTree parseTree) {
         if (!needRewrite(parseTree)) return "";
-        ParseTree forClause = parseTree.getChild(0);
-        ParseTree whereClause = parseTree.getChild(1);
-        ParseTree returnClause = parseTree.getChild(2);
+        boolean canMergeRoot = true;
+        while(canMergeRoot) {
+            canMergeRoot = false;
+            String left = null;
+            String right = null;
+            for (String[] pair : pairs) {
+                left = pair[0];
+                right = pair[1];
+                if (left.indexOf('\"') != -1 || right.indexOf('\"') != -1) continue;
+                String parentLeft = var2root.get(left);
+                String parentRight = var2root.get(right);
+                if (!parentLeft.equals(parentRight)) {
+                    canMergeRoot = true;
+                    break;
+                }
+            }
+            if (!canMergeRoot) break;   // do not need to construct join clause
 
+            // merge two roots in var2root
+            String joinedXq1 = joinXq(var2root.get(left));
+            String joinedXq2 = joinXq(var2root.get(left));
+            String[] attrs = joinAttr(left,right);
+            String joinConstructed = "join (\n" + joinedXq1 + ",\n" + joinedXq2 + ",\n" + attrs[0] + ",\n" + attrs[1] + " )\n";
+            String leftRoot = var2root.get(left);
+            String rightRoot = var2root.get(right);
+            root2join.put(leftRoot,joinConstructed);
 
+            // merge right to the left
+            ArrayList<String> rightVars = root2child.get(rightRoot);
+            for (String var : rightVars) {
+                var2root.put(var,leftRoot);
+            }
+        }
 
+        // get the optimize query
+        Map<String, String> tuple = new HashMap<>();
+        for (Map.Entry<String,String> entry : root2join.entrySet()) {
+            tuple.put(entry.getKey(),entry.getValue());
+        }
+        // get nested join clause
+        StringBuilder res = new StringBuilder();
+        for (Map.Entry<String,String> entry : root2join.entrySet()) {
+
+        }
     }
+
+    private static String joinXq(String root) {
+        if (root2join.containsKey(root)) {
+            return root2join.get(root);
+        }
+        StringBuffer res = new StringBuffer();
+        res.append("for ");
+        res.append("$").append(root).append(" in ").append(var2xq.get(root));
+        ArrayList<String> childVars = root2child.get(root);
+        for (String var : childVars) {
+            res.append(", \n").append("$").append(var).append(" in ").append(var2xq.get(var));
+        }
+        res.append("\n");
+        if (root2where.containsKey(root)) {
+            // need to add where clause in this joinXQ
+            res.append(root2where.get(root));
+            res.append("\n");
+        }
+        res.append("return <tuple> {").append("\n");
+        res.append("\t").append("<").append(root).append("> {$").append(root).append("} </").append(root).append(">");
+        for (String var : childVars) {
+            res.append(", \n").append("\t").append("<").append(var).append("> {$").append(var).append("} </").append(var).append(">");
+        }
+        res.append("\t").append("}</tuple>\n");
+        return res.toString();
+    }
+
+    private static String[] joinAttr(String left, String right) {
+        StringBuffer res1 = new StringBuffer();
+        StringBuffer res2 = new StringBuffer();
+        res1.append("[");
+        res2.append("[");
+        for (String[] pair : pairs) {
+            // merge to join clause
+            String attr1 = pair[0];
+            String attr2 = pair[1];
+            if (attr1.indexOf('\"') != -1 || attr2.indexOf('\"') != -1) continue;   // do not need to set the attribute
+            String attr1Root = var2root.get(attr1);
+            String attr2Root = var2root.get(attr2);
+            if (attr1Root.equals(var2root.get(left)) && attr2Root.equals(var2root.get(right))) {
+                if (res1.length() == 1) res1.append(attr1);
+                else res1.append(", ").append(attr1);
+                if (res2.length() == 1) res2.append(attr2);
+                else res2.append(", ").append(attr2);
+            }
+            if (attr2Root.equals(var2root.get(left)) && attr1Root.equals(var2root.get(right))) {
+                if (res1.length() == 1) res1.append(attr2);
+                else res1.append(", ").append(attr2);
+                if (res2.length() == 1) res2.append(attr1);
+                else res2.append(", ").append(attr1);
+            }
+        }
+        res1.append("]");
+        res2.append("]");
+        return new String[]{res1.toString(), res2.toString()};
+    }
+
 
 
     private static String printNode(Node node) {
