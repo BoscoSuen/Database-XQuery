@@ -106,6 +106,7 @@ public class XQueryOptimize {
         }
     }
 
+
     public static String trimVarString(String input) {
         return input.substring(input.indexOf("$") + 1).trim();
     }
@@ -113,8 +114,6 @@ public class XQueryOptimize {
     public static String completeVarString(String input) {
         return input.startsWith("\"")? input : "$" + input;
     }
-
-
     public static boolean needRewrite(ParseTree parseTree) {
         ParseTree forClause = parseTree.getChild(0);
         ParseTree whereClause = parseTree.getChild(1);
