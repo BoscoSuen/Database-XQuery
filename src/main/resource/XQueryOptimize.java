@@ -24,6 +24,7 @@ public class XQueryOptimize {
     static ArrayList<String[]> pairs = new ArrayList<>();
     static Map<String, String> root2where = new HashMap<>();
     static Map<String, String> root2join = new HashMap<>();
+    static boolean nestedFlag = false;
 
 
     public static void main(String[] args) throws IOException {
@@ -67,13 +68,13 @@ public class XQueryOptimize {
         ParseTree rewrittenParseTree = rewrittenParser.xq();
 
         xQueryMyVisitor visitor = new xQueryMyVisitor();
-        ArrayList<Node> list = (ArrayList<Node>) visitor.visit(rewrittenParseTree);
-        System.out.println("Number of nodes found: " + list.size());
-
-        for (Node n : list) {
-            String curOutput = printNode(n);
-            System.out.println("curOutput is:\n" + curOutput);
-        }
+//        ArrayList<Node> list = (ArrayList<Node>) visitor.visit(rewrittenParseTree);
+//        System.out.println("Number of nodes found: " + list.size());
+//
+//        for (Node n : list) {
+//            String curOutput = printNode(n);
+//            System.out.println("curOutput is:\n" + curOutput);
+//        }
     }
 
     public static void parsingForClause(ParseTree forClause) {
@@ -146,7 +147,7 @@ public class XQueryOptimize {
             root2where.put(where1Root, root2where.getOrDefault(where1Root, "") + toAdd);
         }
         for (Map.Entry<String, String> e : root2where.entrySet()) {
-            System.out.println(e.getKey() + "," + e.getValue());
+//            System.out.println(e.getKey() + "," + e.getValue());
         }
         return flag;
     }
@@ -174,15 +175,16 @@ public class XQueryOptimize {
 
             // merge two roots in var2root
             String joinedXq1 = joinXq(var2root.get(left));
-            String joinedXq2 = joinXq(var2root.get(left));
+            String joinedXq2 = joinXq(var2root.get(right));
             String[] attrs = joinAttr(left,right);
-            String joinConstructed = "join (\n" + joinedXq1 + ",\n" + joinedXq2 + ",\n" + attrs[0] + ",\n" + attrs[1] + " )\n";
+            String joinConstructed = "join (\n" + joinedXq1 + ",\n" + joinedXq2 + ",\n" + attrs[0] + "," + attrs[1] + " )\n";
             String leftRoot = var2root.get(left);
             String rightRoot = var2root.get(right);
             root2join.put(leftRoot,joinConstructed);
 
             // merge right to the left
             ArrayList<String> rightVars = root2child.get(rightRoot);
+            var2root.put(rightRoot,leftRoot);
             for (String var : rightVars) {
                 var2root.put(var,leftRoot);
             }
@@ -203,6 +205,7 @@ public class XQueryOptimize {
         }
         // get nested join clause
         StringBuilder res = new StringBuilder();
+        res.append("for ");
         int loopCount = 0;
         for (Map.Entry<String,String> entry : root2join.entrySet()) {
             String tuple = tupleMap.get(entry.getKey());
@@ -222,20 +225,25 @@ public class XQueryOptimize {
         if (returnNode instanceof TerminalNode) {
             // base case
             String cur = returnNode.getText();
+//            System.out.println(cur);
             if (cur.indexOf("$") == 0) {
+                nestedFlag = true;
+                return "";
+            } else if (nestedFlag) {
                 String rootVar = var2root.get(cur);
                 String tuple = tupleMap.get(rootVar);
-                String var = cur.substring(1);
-                return tuple + '/' + var + "/*";
+                nestedFlag = false;
+                return tuple + '/' + cur + "/*";
             } else {
                 return cur;
             }
+        } else {
+            StringBuilder res = new StringBuilder();
+            for(int i = 0; i < returnNode.getChildCount(); i++) {
+                res.append(getReturnClause(tupleMap,returnNode.getChild(i)));
+            }
+            return res.toString();
         }
-        StringBuilder res = new StringBuilder();
-        for(int i = 0; i < returnNode.getChildCount(); i++) {
-            res.append(getReturnClause(tupleMap,returnNode.getChild(i)));
-        }
-        return res.toString();
     }
 
     private static String joinXq(String root) {
