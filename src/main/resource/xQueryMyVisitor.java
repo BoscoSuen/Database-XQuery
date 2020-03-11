@@ -637,13 +637,51 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
         ArrayList<Node> res = new ArrayList<>();
         ArrayList<Node> xq0 = (ArrayList<Node>) visit(ctx.xq(0));
         ArrayList<Node> xq1 = (ArrayList<Node>) visit(ctx.xq(1));
-
-
+        String[] attr1 = new String[ctx.attrList(0).NAME().size()];
+        String[] attr2 = new String[ctx.attrList(1).NAME().size()];
+        for (int i = 0; i < ctx.attrList(0).NAME().size(); ++i) {
+            attr1[i] = ctx.attrList(0).NAME(i).getText();
+            attr2[i] = ctx.attrList(1).NAME(i).getText();
+        }
+        Map<ArrayList<String>, ArrayList<Node>> hashJoinMap = new HashMap<>();
+        constructHashJoinTable(attr1, xq0, hashJoinMap);
+//        System.out.println(hashJoinMap.size());
+        hashJoin(res, hashJoinMap, attr2, xq1);
         return res;
     }
 
+    private void constructHashJoinTable(String[] attrList, ArrayList<Node> nodeList,
+                                        Map<ArrayList<String>, ArrayList<Node>> hashJoinMap) {
+        for (Node node : nodeList) {
+            ArrayList<String> key = getKey(attrList, node);
+            ArrayList<Node> value = hashJoinMap.getOrDefault(key, new ArrayList<Node>());
+            value.add(node);
+            hashJoinMap.put(key, value);
+        }
+    }
 
+    private void hashJoin(ArrayList<Node> res, Map<ArrayList<String>, ArrayList<Node>> hashJoinMap,
+                          String[] attrList, ArrayList<Node> nodeList) {
+        for (Node node : nodeList) {
+            ArrayList<String> key = getKey(attrList, node);
+            if (hashJoinMap.containsKey(key)) {
+                res.addAll(getChildren(hashJoinMap.get(key)));
+                res.addAll(getChildren(new ArrayList<Node>(Arrays.asList(node))));
+            }
+        }
+    }
 
+    private ArrayList<String> getKey(String[] attrList, Node node) {
+        ArrayList<String> key = new ArrayList<>();
+        for (String attr : attrList) {
+            for (Node child : getChildren(new ArrayList<Node>(Arrays.asList(node)))) {
+                if (attr.equals(child.getNodeName())) {
+                    key.add(child.getTextContent());
+                }
+            }
+        }
+        return key;
+    }
 
     private static String printNode(Node node) {
         StringWriter stringWriter = new StringWriter();

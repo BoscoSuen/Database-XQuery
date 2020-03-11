@@ -47,7 +47,7 @@ public class XQueryOptimize {
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         xQueryParser parser = new xQueryParser(tokens);
         ParseTree parseTree = parser.xq();
-        
+
         String queryRewritten = rewrite(parseTree);
         if (queryRewritten.length() == 0) queryRewritten = inputQuery;
         else {
