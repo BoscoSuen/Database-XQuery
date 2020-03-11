@@ -637,15 +637,8 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
         ArrayList<Node> res = new ArrayList<>();
         ArrayList<Node> xq0 = (ArrayList<Node>) visit(ctx.xq(0));
         ArrayList<Node> xq1 = (ArrayList<Node>) visit(ctx.xq(1));
-        String[] attr1 = new String[ctx.attrList(0).NAME().size()];
-        String[] attr2 = new String[ctx.attrList(0).NAME().size()];
-        for (int i = 0; i < ctx.attrList(0).NAME().size(); ++i) {
-            attr1[i] = ctx.attrList(0).NAME(i).getText();
-            attr2[i] = ctx.attrList(1).NAME(i).getText();
-        }
-        Map<String, ArrayList<Node>> hashJoinMap = new HashMap<>();
-        constructHashJoinTable(attr1,xq0);
-        Join(res,hashJoinMap,att1,attr2,xq1);
+
+
         return res;
     }
 
