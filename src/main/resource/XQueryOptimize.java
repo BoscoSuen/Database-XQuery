@@ -109,14 +109,6 @@ public class XQueryOptimize {
     }
 
     public static void parsingWhereClause(ParseTree allCond) {
-//        System.out.println(allCond.getChild(1).getText());
-//        List<String> condList = Arrays.asList(allCond.getText().split("and"));
-//        for (String cond : condList) {
-//            // System.out.println(cond);
-//            String[] vars = cond.split(cond.contains("eq")? "eq" : "=");
-//            // System.out.println(vars[0] + "," + vars[1] + "\n");
-//            pairs.add(new String[]{trimVarString(vars[0]), trimVarString(vars[1])});
-//        }
         String curr = allCond.getChild(1).getText();
         if (curr.equals("eq") || curr.equals("=")) {
             pairs.add(new String[]{trimVarString(allCond.getChild(0).getText()),
@@ -189,7 +181,6 @@ public class XQueryOptimize {
                 if (left.startsWith("\"") || right.startsWith("\"") || parentLeft.equals(parentRight)) {
                     continue;
                 }
-                System.out.println(left + ":" + parentLeft + ", " + right + ":" + parentRight );
                 canMergeRoot = true;
                 break;
             }
@@ -207,6 +198,7 @@ public class XQueryOptimize {
             // merge right to the left
             ArrayList<String> rightVars = root2child.get(rightRoot);
             var2root.put(rightRoot,leftRoot);
+            var2root.put(right,leftRoot);
             for (String var : rightVars) {
                 var2root.put(var,leftRoot);
             }
