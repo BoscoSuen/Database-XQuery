@@ -109,10 +109,21 @@ public class XQueryOptimize {
     }
 
     public static void parsingWhereClause(ParseTree allCond) {
-        List<String> condList = Arrays.asList(allCond.getText().split("and"));
-        for (String cond : condList) {
-            String[] vars = cond.split(cond.contains("eq")? "eq" : "=");
-            pairs.add(new String[]{trimVarString(vars[0]), trimVarString(vars[1])});
+//        System.out.println(allCond.getChild(1).getText());
+//        List<String> condList = Arrays.asList(allCond.getText().split("and"));
+//        for (String cond : condList) {
+//            // System.out.println(cond);
+//            String[] vars = cond.split(cond.contains("eq")? "eq" : "=");
+//            // System.out.println(vars[0] + "," + vars[1] + "\n");
+//            pairs.add(new String[]{trimVarString(vars[0]), trimVarString(vars[1])});
+//        }
+        String curr = allCond.getChild(1).getText();
+        if (curr.equals("eq") || curr.equals("=")) {
+            pairs.add(new String[]{trimVarString(allCond.getChild(0).getText()),
+                    trimVarString(allCond.getChild(2).getText())});
+        } else {
+            parsingWhereClause(allCond.getChild(0));
+            parsingWhereClause(allCond.getChild(2));
         }
     }
 
@@ -124,6 +135,7 @@ public class XQueryOptimize {
     public static String completeVarString(String input) {
         return input.startsWith("\"")? input : "$" + input;
     }
+
     public static boolean needRewrite(ParseTree parseTree) {
         ParseTree forClause = parseTree.getChild(0);
         ParseTree whereClause = parseTree.getChild(1);
@@ -155,9 +167,9 @@ public class XQueryOptimize {
             toAdd = root2where.containsKey(where1Root) ? " and " + toAdd : "where " + toAdd;
             root2where.put(where1Root, root2where.getOrDefault(where1Root, "") + toAdd);
         }
-        for (Map.Entry<String, String> e : root2where.entrySet()) {
+//        for (Map.Entry<String, String> e : root2where.entrySet()) {
 //            System.out.println(e.getKey() + "," + e.getValue());
-        }
+//        }
         return flag;
     }
 
@@ -167,18 +179,19 @@ public class XQueryOptimize {
         boolean canMergeRoot = true;
         while(canMergeRoot) {
             canMergeRoot = false;
-            String left = null;
-            String right = null;
+            String left = "";
+            String right = "";
             for (String[] pair : pairs) {
                 left = pair[0];
                 right = pair[1];
-                if (left.indexOf('\"') != -1 || right.indexOf('\"') != -1) continue;
                 String parentLeft = var2root.get(left);
                 String parentRight = var2root.get(right);
-                if (!parentLeft.equals(parentRight)) {
-                    canMergeRoot = true;
-                    break;
+                if (left.startsWith("\"") || right.startsWith("\"") || parentLeft.equals(parentRight)) {
+                    continue;
                 }
+                System.out.println(left + ":" + parentLeft + ", " + right + ":" + parentRight );
+                canMergeRoot = true;
+                break;
             }
             if (!canMergeRoot) break;   // do not need to construct join clause
 
