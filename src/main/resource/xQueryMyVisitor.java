@@ -653,7 +653,7 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
                                         Map<ArrayList<String>, ArrayList<Node>> hashJoinMap) {
         for (Node node : nodeList) {
             ArrayList<String> key = getKey(attrList, node);
-            ArrayList<Node> value = hashJoinMap.getOrDefault(key, new ArrayList<Node>());
+            ArrayList<Node> value = hashJoinMap.getOrDefault(key, new ArrayList<>());
             value.add(node);
             hashJoinMap.put(key, value);
         }
@@ -664,8 +664,11 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
         for (Node node : nodeList) {
             ArrayList<String> key = getKey(attrList, node);
             if (hashJoinMap.containsKey(key)) {
-                res.addAll(getChildren(hashJoinMap.get(key)));
-                res.addAll(getChildren(new ArrayList<Node>(Arrays.asList(node))));
+                for (Node n : hashJoinMap.get(key)) {
+                    ArrayList<Node> temp = getChildren(new ArrayList<>(Arrays.asList(n)));
+                    temp.addAll(getChildren(new ArrayList<>(Arrays.asList(node))));
+                    res.addAll(makeElem("tuple", temp));
+                }
             }
         }
     }
@@ -673,7 +676,7 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
     private ArrayList<String> getKey(String[] attrList, Node node) {
         ArrayList<String> key = new ArrayList<>();
         for (String attr : attrList) {
-            for (Node child : getChildren(new ArrayList<Node>(Arrays.asList(node)))) {
+            for (Node child : getChildren(new ArrayList<>(Arrays.asList(node)))) {
                 if (attr.equals(child.getNodeName())) {
                     key.add(child.getTextContent());
                 }
