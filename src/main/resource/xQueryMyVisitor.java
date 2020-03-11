@@ -679,6 +679,7 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
         for (String attr : attrList) {
             for (Node child : getChildren(new ArrayList<>(Arrays.asList(node)))) {
                 if (attr.equals(child.getNodeName())) {
+                    // TODO: check getFirstChild()
                     key.add(child.getTextContent());
                 }
             }

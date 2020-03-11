@@ -1,34 +1,69 @@
 for $tuple in join (
-for $q1 in doc("j_caesar.xml")//ACT, 
-$sa in $q1//SCENE, 
-$spa in $sa//SPEAKER, 
-$spb in $sa//SPEAKER/text(), 
-$spea in $sa//SPEECH, 
-$spec in $sa//SPEECH
-where $spb eq "FLAVIUS"
+join (
+join (
+join (
+for $a1 in doc("j_caesar.xml")//ACT, 
+$a2 in $a1/TITLE, 
+$a3 in $a1/SCENE, 
+$a4 in $a3/SPEECH, 
+$a5 in $a3/STAGEDIR/text(), 
+$a6 in $a4/SPEAKER
+where $a5 eq "Enter FLAVIUS, MARULLUS, and certain Commoners"
 return <tuple> {
-	<q1> {$q1} </q1>, 
-	<sa> {$sa} </sa>, 
-	<spa> {$spa} </spa>, 
-	<spb> {$spb} </spb>, 
-	<spea> {$spea} </spea>, 
-	<spec> {$spec} </spec>	}</tuple>
+	<a1> {$a1} </a1>, 
+	<a2> {$a2} </a2>, 
+	<a3> {$a3} </a3>, 
+	<a4> {$a4} </a4>, 
+	<a5> {$a5} </a5>, 
+	<a6> {$a6} </a6>	}</tuple>
 ,
-for $q2 in doc("j_caesar.xml")//ACT, 
-$sb in $q2//SCENE, 
-$spc in $sb//SPEAKER, 
-$spd in $sb//SPEAKER/text(), 
-$speb in $sb//SPEECH, 
-$sped in $sb//SPEECH
-where $spd eq "FLAVIUS"
+for $c1 in doc("j_caesar.xml")//ACT, 
+$c2 in $c1//SPEAKER, 
+$c3 in $c1/TITLE
 return <tuple> {
-	<q2> {$q2} </q2>, 
-	<sb> {$sb} </sb>, 
-	<spc> {$spc} </spc>, 
-	<spd> {$spd} </spd>, 
-	<speb> {$speb} </speb>, 
-	<sped> {$sped} </sped>	}</tuple>
+	<c1> {$c1} </c1>, 
+	<c2> {$c2} </c2>, 
+	<c3> {$c3} </c3>	}</tuple>
 ,
-[sa, spa, spec, spea],[sb, spc, speb, sped] )
+[a6],[c2] )
+,
+join (
+for $b1 in doc("j_caesar.xml")//ACT, 
+$b2 in $b1//SPEECH, 
+$b3 in $b1/TITLE
+return <tuple> {
+	<b1> {$b1} </b1>, 
+	<b2> {$b2} </b2>, 
+	<b3> {$b3} </b3>	}</tuple>
+,
+for $d1 in doc("j_caesar.xml")//ACT, 
+$d2 in $d1//TITLE
+return <tuple> {
+	<d1> {$d1} </d1>, 
+	<d2> {$d2} </d2>	}</tuple>
+,
+[b3],[d2] )
+,
+[a4, a1, c1],[b2, d1, b1] )
+,
+for $b1 in doc("j_caesar.xml")//ACT, 
+$b2 in $b1//SPEECH, 
+$b3 in $b1/TITLE
+return <tuple> {
+	<b1> {$b1} </b1>, 
+	<b2> {$b2} </b2>, 
+	<b3> {$b3} </b3>	}</tuple>
+,
+[b3, a1],[d2, d1] )
+,
+for $b1 in doc("j_caesar.xml")//ACT, 
+$b2 in $b1//SPEECH, 
+$b3 in $b1/TITLE
+return <tuple> {
+	<b1> {$b1} </b1>, 
+	<b2> {$b2} </b2>, 
+	<b3> {$b3} </b3>	}</tuple>
+,
+[a1],[d1] )
 
-return<result>{<title>{$tuple/sa/*/TITLE/text()}</title>,<speaker>{$tuple/spa/*/*}</speaker>}</result>
+return<triplet>{$tuple/a1/*,$tuple/b1/*,$tuple/c1/*,$tuple/d1/*}</triplet>

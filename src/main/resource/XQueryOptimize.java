@@ -50,15 +50,13 @@ public class XQueryOptimize {
 
         String queryRewritten = rewrite(parseTree);
         if (queryRewritten.length() == 0) queryRewritten = inputQuery;
-        else {
-            // rewrite the query and save the query format
-            File outputFile = new File("OptimizedQuery.txt");
-            FileOutputStream fileOutputStream = new FileOutputStream(outputFile);
-            BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(fileOutputStream));
-            bufferedWriter.write(queryRewritten);
-            bufferedWriter.close();
-            fileOutputStream.close();
-        }
+        // rewrite the query and save the query format
+        File outputFile = new File("OptimizedQuery.txt");
+        FileOutputStream fileOutputStream = new FileOutputStream(outputFile);
+        BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(fileOutputStream));
+        bufferedWriter.write(queryRewritten);
+        bufferedWriter.close();
+        fileOutputStream.close();
 
         File reInputFile = new File("OptimizedQuery.txt");
         FileInputStream fileReinputStream = new FileInputStream(reInputFile);
@@ -81,10 +79,10 @@ public class XQueryOptimize {
         ArrayList<Node> list = (ArrayList<Node>) visitor.visit(rewrittenParseTree);
         System.out.println("Number of nodes found: " + list.size());
 
-        for (Node n : list) {
-            String curOutput = printNode(n);
-            System.out.println("curOutput is:\n" + curOutput);
-        }
+//        for (Node n : list) {
+//            String curOutput = printNode(n);
+//            System.out.println("curOutput is:\n" + curOutput);
+//        }
     }
 
     public static void parsingForClause(ParseTree forClause) {
@@ -171,8 +169,8 @@ public class XQueryOptimize {
         boolean canMergeRoot = true;
         while(canMergeRoot) {
             canMergeRoot = false;
-            String left = "";
-            String right = "";
+            String left = null;
+            String right = null;
             for (String[] pair : pairs) {
                 left = pair[0];
                 right = pair[1];
@@ -193,36 +191,41 @@ public class XQueryOptimize {
             String joinConstructed = "join (\n" + joinedXq1 + ",\n" + joinedXq2 + ",\n" + attrs[0] + "," + attrs[1] + " )\n";
             String leftRoot = var2root.get(left);
             String rightRoot = var2root.get(right);
+//            System.out.println("leftRoot:" + leftRoot + ", rightRoot: " + rightRoot);
             root2join.put(leftRoot,joinConstructed);
 
             // merge right to the left
             ArrayList<String> rightVars = root2child.get(rightRoot);
             var2root.put(rightRoot,leftRoot);
+            // TODO: check if we need to delete the root2join Key
+            if (root2join.size() > 1 && root2join.containsKey(rightRoot)) root2join.remove(rightRoot);
+            //
             var2root.put(right,leftRoot);
             for (String var : rightVars) {
                 var2root.put(var,leftRoot);
             }
+            if(var2root.values().size() == 1) break;
         }
 
         // get the optimize query
-        Map<String, String> tupleMap = new HashMap<>();
-        int nestedCount = 0;    // count the nested tuples
-        for (Map.Entry<String,String> entry : root2join.entrySet()) {
-            if (nestedCount == 0) {
-                String tuple = "$tuple";
-                tupleMap.put(entry.getKey(),tuple);
-            } else {
-                String tuple = "$tuple" + String.valueOf(nestedCount);
-                tupleMap.put(entry.getKey(),tuple);
-            }
-            nestedCount++;
-        }
+//        Map<String, String> tupleMap = new HashMap<>();
+//        int nestedCount = 0;    // count the nested tuples
+//        for (Map.Entry<String,String> entry : root2join.entrySet()) {
+//            if (nestedCount == 0) {
+//                String tuple = "$tuple";
+//                tupleMap.put(entry.getKey(),tuple);
+//            } else {
+//                String tuple = "$tuple" + String.valueOf(nestedCount);
+//                tupleMap.put(entry.getKey(),tuple);
+//            }
+//            nestedCount++;
+//        }
         // get nested join clause
         StringBuilder res = new StringBuilder();
         res.append("for ");
         int loopCount = 0;
         for (Map.Entry<String,String> entry : root2join.entrySet()) {
-            String tuple = tupleMap.get(entry.getKey());
+            String tuple = "$tuple";
             if (loopCount > 0) {
                 res.append(", \n");
             }
@@ -231,21 +234,19 @@ public class XQueryOptimize {
         }
 
         // append the nest return clause
-        res.append("\n").append(getReturnClause(tupleMap,parseTree.getChild(2)));
+        res.append("\n").append(getReturnClause(parseTree.getChild(2)));
         return res.toString();
     }
 
-    private static String getReturnClause(Map<String,String> tupleMap, ParseTree returnNode) {
+    private static String getReturnClause(ParseTree returnNode) {
         if (returnNode instanceof TerminalNode) {
             // base case
             String cur = returnNode.getText();
-//            System.out.println(cur);
             if (cur.indexOf("$") == 0) {
                 nestedFlag = true;
                 return "";
             } else if (nestedFlag) {
-                String rootVar = var2root.get(cur);
-                String tuple = tupleMap.get(rootVar);
+                String tuple = "$tuple";
                 nestedFlag = false;
                 return tuple + '/' + cur + "/*";
             } else {
@@ -254,7 +255,7 @@ public class XQueryOptimize {
         } else {
             StringBuilder res = new StringBuilder();
             for(int i = 0; i < returnNode.getChildCount(); i++) {
-                res.append(getReturnClause(tupleMap,returnNode.getChild(i)));
+                res.append(getReturnClause(returnNode.getChild(i)));
             }
             return res.toString();
         }
