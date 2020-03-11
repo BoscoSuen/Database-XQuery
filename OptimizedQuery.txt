@@ -1,46 +1,34 @@
 for $tuple in join (
-join (
-for $b1 in doc("book.xml")//book, 
-$aj in $b1/author/first/text(), 
-$a1 in $b1/author, 
-$af1 in $a1/first/text(), 
-$al1 in $a1/last/text()
-where $aj eq "W."
+for $q1 in doc("j_caesar.xml")//ACT, 
+$sa in $q1//SCENE, 
+$spa in $sa//SPEAKER, 
+$spb in $sa//SPEAKER/text(), 
+$spea in $sa//SPEECH, 
+$spec in $sa//SPEECH
+where $spb eq "FLAVIUS"
 return <tuple> {
-	<b1> {$b1} </b1>, 
-	<aj> {$aj} </aj>, 
-	<a1> {$a1} </a1>, 
-	<af1> {$af1} </af1>, 
-	<al1> {$al1} </al1>	}</tuple>
+	<q1> {$q1} </q1>, 
+	<sa> {$sa} </sa>, 
+	<spa> {$spa} </spa>, 
+	<spb> {$spb} </spb>, 
+	<spea> {$spea} </spea>, 
+	<spec> {$spec} </spec>	}</tuple>
 ,
-for $b2 in doc("book.xml")//book, 
-$a21 in $b2/author, 
-$af21 in $a21/first/text(), 
-$al21 in $a21/last/text(), 
-$a22 in $b2/author, 
-$af22 in $a22/first/text(), 
-$al22 in $a22/last/text()
+for $q2 in doc("j_caesar.xml")//ACT, 
+$sb in $q2//SCENE, 
+$spc in $sb//SPEAKER, 
+$spd in $sb//SPEAKER/text(), 
+$speb in $sb//SPEECH, 
+$sped in $sb//SPEECH
+where $spd eq "FLAVIUS"
 return <tuple> {
-	<b2> {$b2} </b2>, 
-	<a21> {$a21} </a21>, 
-	<af21> {$af21} </af21>, 
-	<al21> {$al21} </al21>, 
-	<a22> {$a22} </a22>, 
-	<af22> {$af22} </af22>, 
-	<al22> {$al22} </al22>	}</tuple>
+	<q2> {$q2} </q2>, 
+	<sb> {$sb} </sb>, 
+	<spc> {$spc} </spc>, 
+	<spd> {$spd} </spd>, 
+	<speb> {$speb} </speb>, 
+	<sped> {$sped} </sped>	}</tuple>
 ,
-[af1, al1],[af21, al21] )
-,
-for $b3 in doc("book.xml")//book, 
-$a3 in $b3/author, 
-$af3 in $a3/first/text(), 
-$al3 in $a3/last/text()
-return <tuple> {
-	<b3> {$b3} </b3>, 
-	<a3> {$a3} </a3>, 
-	<af3> {$af3} </af3>, 
-	<al3> {$al3} </al3>	}</tuple>
-,
-[af22, al22],[af3, al3] )
+[sa, spa, spec, spea],[sb, spc, speb, sped] )
 
-return<triplet>{$tuple/b1/*,$tuple/b2/*,$tuple/b3/*}</triplet>
+return<result>{<title>{$tuple/sa/*/TITLE/text()}</title>,<speaker>{$tuple/spa/*/*}</speaker>}</result>
