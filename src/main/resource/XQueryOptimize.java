@@ -242,6 +242,7 @@ public class XQueryOptimize {
         if (returnNode instanceof TerminalNode) {
             // base case
             String cur = returnNode.getText();
+            System.out.println(cur);
             if (cur.indexOf("$") == 0) {
                 nestedFlag = true;
                 return "";
