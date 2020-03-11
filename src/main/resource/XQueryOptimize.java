@@ -193,18 +193,18 @@ public class XQueryOptimize {
             String rightRoot = var2root.get(right);
 //            System.out.println("leftRoot:" + leftRoot + ", rightRoot: " + rightRoot);
             root2join.put(leftRoot,joinConstructed);
-
+            root2join.remove(rightRoot);
             // merge right to the left
             ArrayList<String> rightVars = root2child.get(rightRoot);
             var2root.put(rightRoot,leftRoot);
             // TODO: check if we need to delete the root2join Key
-            if (root2join.size() > 1 && root2join.containsKey(rightRoot)) root2join.remove(rightRoot);
+//            if (root2join.size() > 1 && root2join.containsKey(rightRoot)) root2join.remove(rightRoot);
             //
             var2root.put(right,leftRoot);
             for (String var : rightVars) {
                 var2root.put(var,leftRoot);
             }
-            if(var2root.values().size() == 1) break;
+//            if(var2root.values().size() == 1) break;
         }
 
         // get the optimize query
