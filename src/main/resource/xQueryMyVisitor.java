@@ -659,18 +659,19 @@ public class xQueryMyVisitor extends xQueryBaseVisitor<Object> {
             ArrayList<Node> value = hashJoinMap.getOrDefault(key, new ArrayList<>());
             value.add(node);
             hashJoinMap.put(key, value);
+            // mapping List<String> -> List<Node>
         }
     }
 
     private void hashJoin(ArrayList<Node> res, Map<ArrayList<String>, ArrayList<Node>> hashJoinMap,
                           String[] attrList, ArrayList<Node> nodeList) {
-        for (Node node : nodeList) {
+        for (Node node : nodeList) { //right nodes list
             ArrayList<String> key = getKey(attrList, node);
             if (hashJoinMap.containsKey(key)) {
                 for (Node n : hashJoinMap.get(key)) {
                     ArrayList<Node> temp = getChildren(new ArrayList<>(Arrays.asList(n)));
                     temp.addAll(getChildren(new ArrayList<>(Arrays.asList(node))));
-                    res.addAll(makeElem("tuple", temp));
+                    res.addAll(makeElem("tuple", temp)); // $b = $a
                 }
             }
         }

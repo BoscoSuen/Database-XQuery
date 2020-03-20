@@ -1,22 +1,26 @@
-for $a1 in doc("j_caesar.xml")//ACT,
-$a2 in doc("j_caesar.xml")//ACT,
-$a3 in doc("j_caesar.xml")//ACT,
-$a4 in doc("j_caesar.xml")//ACT,
-$sc1 in $a1//SCENE,
-$sc2 in $a2//SCENE,
-$sc3 in $a3//SCENE,
-$sc4 in $a4//SCENE,
-$sp4 in $sc4//SPEAKER/text(),
-$sp2 in $sc2//SPEAKER/text(),
-$sp1 in $sc1//SPEAKER/text(),
-$sp3 in $sc3//SPEAKER/text()
-where $sp1 = "FLAVIUS" and $sp1 eq $sp2 and $sp2 eq $sp3 and $sp3 eq
-$sp4 and $sc1 eq $sc2 and $sc2 eq $sc3 and $sc3 eq $sc4
-return <result> {
-<speaker>{$sp1}</speaker>,
-<scene>{$sc1/TITLE/text()}</scene>,
-<act1>{$a1/TITLE/text()}</act1>,
-<act2>{$a2/TITLE/text()}</act2>,
-<act3>{$a3/TITLE/text()}</act3>,
-<act4>{$a4/TITLE/text()}</act4>
-}</result>
+for $b1 in doc("book.xml")/book,
+    $aj in $b1/author/first/text(),
+    $a1 in $b1/author,
+    $af1 in $a1/first,
+    $al1 in $a1/last,
+
+    $b2 in doc("book.xml")/book,
+    $a2 in $b2/author,
+    $af21 in $a2/first,
+    $al21 in $a2/last,
+
+    $b3 in doc("book.xml")/book,
+    $a3 in $b3/author,
+    $af3 in $a3/first,
+    $al3 in $a3/last,
+
+    $b4 in doc("book.xml")/book,
+    $a4 in $b4/author,
+    $af4 in $a4/first,
+    $al4 in $a4/last
+
+where $aj eq "W." and
+      $a1 eq $a2 and $a2 eq $a3 and
+      $a3 eq $a4
+
+return <triplet> {$b1, $b2, $b3, $b4} </triplet>

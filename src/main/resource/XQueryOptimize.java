@@ -170,9 +170,29 @@ public class XQueryOptimize {
     }
 
 
-    public static String rewrite(ParseTree parseTree) {
+    public static String rewrite(ParseTree parseTree, char flag) {
         if (!needRewrite(parseTree)) return "";
         ArrayList<String> root = new ArrayList<>(root2child.keySet());
+        if (flag == 'L') {
+            return left_join(root);
+        } else {
+            return bushy_join(root);
+        }
+    }
+
+    private static String bushy_join(ArrayList<String> root) {
+        if (root.size() <= 2) {
+            return left_join(root);
+        }
+        ArrayList<String> left = null;
+        ArrayList<String> right = null;
+
+    }
+
+    // base case
+    private static String left_join(ArrayList<String> root) {
+//        if (!needRewrite(parseTree)) return "";
+//        ArrayList<String> root = new ArrayList<>(root2child.keySet());
         String result = joinXq(root.get(0));
         // loop through the variable list
         for (int i = 1; i < root.size(); i++) {
@@ -209,6 +229,7 @@ public class XQueryOptimize {
         result += getReturnClause(parseTree.getChild(2));
         return result;
     }
+
 
     private static String getReturnClause(ParseTree returnNode) {
         if (returnNode instanceof TerminalNode) {

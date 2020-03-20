@@ -1,43 +1,53 @@
 for $tuple in join ( 
 join ( 
 join ( 
-for $a1 in doc("j_caesar.xml")//ACT, 
-$sc1 in $a1//SCENE, 
-$sp1 in $sc1//SPEAKER/text()
-where $sp1 eq "FLAVIUS"
+for $b2 in doc("book.xml")/book, 
+$a2 in $b2/author, 
+$af21 in $a2/first, 
+$al21 in $a2/last
 return <tuple> {
-	<a1> {$a1} </a1>, 
-	<sc1> {$sc1} </sc1>, 
-	<sp1> {$sp1} </sp1>	}</tuple>
-,
-for $a2 in doc("j_caesar.xml")//ACT, 
-$sc2 in $a2//SCENE, 
-$sp2 in $sc2//SPEAKER/text()
-return <tuple> {
+	<b2> {$b2} </b2>, 
 	<a2> {$a2} </a2>, 
-	<sc2> {$sc2} </sc2>, 
-	<sp2> {$sp2} </sp2>	}</tuple>
+	<af21> {$af21} </af21>, 
+	<al21> {$al21} </al21>	}</tuple>
 ,
-[sp1, sc1],[sp2, sc2])
-,
-for $a3 in doc("j_caesar.xml")//ACT, 
-$sc3 in $a3//SCENE, 
-$sp3 in $sc3//SPEAKER/text()
+for $b3 in doc("book.xml")/book, 
+$a3 in $b3/author, 
+$af3 in $a3/first, 
+$al3 in $a3/last
 return <tuple> {
+	<b3> {$b3} </b3>, 
 	<a3> {$a3} </a3>, 
-	<sc3> {$sc3} </sc3>, 
-	<sp3> {$sp3} </sp3>	}</tuple>
+	<af3> {$af3} </af3>, 
+	<al3> {$al3} </al3>	}</tuple>
 ,
-[sp2, sc2],[sp3, sc3])
+[a2],[a3])
 ,
-for $a4 in doc("j_caesar.xml")//ACT, 
-$sc4 in $a4//SCENE, 
-$sp4 in $sc4//SPEAKER/text()
+for $b4 in doc("book.xml")/book, 
+$a4 in $b4/author, 
+$af4 in $a4/first, 
+$al4 in $a4/last
 return <tuple> {
+	<b4> {$b4} </b4>, 
 	<a4> {$a4} </a4>, 
-	<sc4> {$sc4} </sc4>, 
-	<sp4> {$sp4} </sp4>	}</tuple>
+	<af4> {$af4} </af4>, 
+	<al4> {$al4} </al4>	}</tuple>
 ,
-[sp3, sc3],[sp4, sc4])
+[a3],[a4])
+,
+for $b1 in doc("book.xml")/book, 
+$aj in $b1/author/first/text(), 
+$a1 in $b1/author, 
+$af1 in $a1/first, 
+$al1 in $a1/last
+where $aj eq "W."
+return <tuple> {
+	<b1> {$b1} </b1>, 
+	<aj> {$aj} </aj>, 
+	<a1> {$a1} </a1>, 
+	<af1> {$af1} </af1>, 
+	<al1> {$al1} </al1>	}</tuple>
+,
+[a2],[a1])
 
-return < result > { < speaker > { $tuple/sp1/*} </ speaker > , < scene > { $tuple/sc1/*/ TITLE / text() } </ scene > , < act1 > { $tuple/a1/*/ TITLE / text() } </ act1 > , < act2 > { $tuple/a2/*/ TITLE / text() } </ act2 > , < act3 > { $tuple/a3/*/ TITLE / text() } </ act3 > , < act4 > { $tuple/a4/*/ TITLE / text() } </ act4 > } </ result > 
+return < triplet > { $tuple/b1/*, $tuple/b2/*, $tuple/b3/*, $tuple/b4/*} </ triplet > 
