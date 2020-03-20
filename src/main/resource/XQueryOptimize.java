@@ -1,6 +1,5 @@
 package main.resource;
 
-import com.sun.org.apache.xerces.internal.util.SynchronizedSymbolTable;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -215,7 +214,6 @@ public class XQueryOptimize {
         // Find the longest path adn divide the graph
         ArrayList<String> longestPath = findLongestString(start, rootPairs, new ArrayList<>(Arrays.asList(start)),
                                                            new ArrayList<>());
-//        System.out.println(longestPath);
         int pathSize = longestPath.size();
         String left = longestPath.get((pathSize / 2) - 1);
         String right = longestPath.get(pathSize / 2);
@@ -277,6 +275,9 @@ public class XQueryOptimize {
     public static ArrayList<String[]> generateRootPairs(ArrayList<String> roots) {
         ArrayList<String[]> rootPairs = new ArrayList<>();
         for (String[] pair : pairs) {
+            if (pair[0].startsWith("\"") || pair[1].startsWith("\"")) {
+                continue;
+            }
             String left = var2root.get(pair[0]);
             String right = var2root.get(pair[1]);
             if (!roots.contains(left) || !roots.contains(right) || containsPair(rootPairs, left, right)) {
@@ -340,7 +341,7 @@ public class XQueryOptimize {
         ArrayList<String> right = devided.get(1);
         String bushyJoinLeft = bushy_join(left);
         String bushyJoinRight = bushy_join(right);
-        String res = " join (" + bushyJoinLeft + ", \n" + bushyJoinRight + "\n";
+        String res = " join (" + bushyJoinLeft + ", \n" + bushyJoinRight + ", \n";
         ArrayList<String> leftCond = new ArrayList<>();
         ArrayList<String> rightCond = new ArrayList<>();
         // get the pairs in different sides
