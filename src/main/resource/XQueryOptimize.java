@@ -1,5 +1,6 @@
 package main.resource;
 
+import com.sun.org.apache.xerces.internal.util.SynchronizedSymbolTable;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -52,7 +53,7 @@ public class XQueryOptimize {
         // optimization
 
 
-        String queryRewritten = rewrite(parseTree);
+        String queryRewritten = rewrite(parseTree,args[0]);
         if (queryRewritten.length() == 0) queryRewritten = inputQuery;
         // rewrite the query and save the query format
         File outputFile = new File("OptimizedQuery.txt");
@@ -89,7 +90,39 @@ public class XQueryOptimize {
             String curOutput = printNode(n);
             System.out.println(curOutput);
         }
-        System.out.println("output size is: " + list.size());
+        System.out.println("Number of nodes found: " + list.size());
+
+        // parameter: a b c d e + where conds
+        // [[a, b] [b, c], [b, e] [c, d]]  a - b - c -d
+        //                                     |
+        //                                     e - f - g
+        //                                         |
+        //                                         h
+
+        //   a:1 b:3 c :2 d:1 e:1
+        //  e - b -a    e - b - c - d
+
+//        var2root.put("a1", "a");
+//        var2root.put("a2", "a");
+//        var2root.put("b1", "b");
+//        var2root.put("c1", "c");
+//        var2root.put("d1", "d");
+//        var2root.put("e1", "e");
+//        var2root.put("f1", "f");
+//        var2root.put("g1", "g");
+//        var2root.put("h1", "h");
+//        pairs.add(new String[]{"a1", "b1"});
+//        pairs.add(new String[]{"a2", "b1"});
+//        pairs.add(new String[]{"b1", "a2"});
+//        pairs.add(new String[]{"b1", "e1"});
+//        pairs.add(new String[]{"b1", "c1"});
+//        pairs.add(new String[]{"c1", "d1"});
+//        pairs.add(new String[]{"d1", "c1"});
+//        pairs.add(new String[]{"e1", "f1"});
+//        pairs.add(new String[]{"h1", "f1"});
+//        pairs.add(new String[]{"g1", "f1"});
+//        ArrayList<String> roots = new ArrayList<>(Arrays.asList("a", "b", "d", "c", "e", "f", "g", "h"));
+//        System.out.println(findMedium(roots));
     }
 
     public static void parsingForClause(ParseTree forClause) {
@@ -123,7 +156,7 @@ public class XQueryOptimize {
             parsingWhereClause(allCond.getChild(2));
         }
     }
-    
+
     public static String trimVarString(String input) {
         return input.substring(input.indexOf("$") + 1).trim();
     }
@@ -142,15 +175,9 @@ public class XQueryOptimize {
         }
         parsingForClause(forClause);
         parsingWhereClause(whereClause.getChild(1));
-//        for (Map.Entry<String, String> e : var2root.entrySet()) {
-//            System.out.println(e.getKey() + "," + e.getValue());
-//        }
-//        for (Map.Entry<String, String> e : var2root.entrySet()) {
-//            System.out.println(e.getKey() + "," + e.getValue());
-//        }
+
         boolean flag = false;
         for (String[] pair : pairs) {
-            // System.out.println(pair[0] + "," + pair[1]);
             String where1 = pair[0];
             String where2 = pair[1];
             String where1Root = where1.startsWith("\"")? "" : var2root.get(where1);
@@ -163,30 +190,191 @@ public class XQueryOptimize {
             toAdd = root2where.containsKey(where1Root) ? " and " + toAdd : "where " + toAdd;
             root2where.put(where1Root, root2where.getOrDefault(where1Root, "") + toAdd);
         }
-//        for (Map.Entry<String, String> e : root2where.entrySet()) {
-//            System.out.println(e.getKey() + "," + e.getValue());
-//        }
         return flag;
     }
 
+    public static ArrayList<ArrayList<String>> findMedium(ArrayList<String> roots) {
+        // Construct pair with roots
+        ArrayList<String[]> rootPairs = generateRootPairs(roots);
 
-    public static String rewrite(ParseTree parseTree, char flag) {
+        // Calculate degrees
+        HashMap<String, Integer> degrees = new HashMap<>();
+        for (String[] rootPair : rootPairs) {
+            degrees.put(rootPair[0], degrees.getOrDefault(rootPair[0], 0) + 1);
+            degrees.put(rootPair[1], degrees.getOrDefault(rootPair[1], 0) + 1);
+        }
+
+        // Find the start node
+        String start = new String();
+        for (Map.Entry<String, Integer> d : degrees.entrySet()) {
+            if (d.getValue() != 1) continue;
+            start = d.getKey();
+            break;
+        }
+
+        // Find the longest path adn divide the graph
+        ArrayList<String> longestPath = findLongestString(start, rootPairs, new ArrayList<>(Arrays.asList(start)),
+                                                           new ArrayList<>());
+//        System.out.println(longestPath);
+        int pathSize = longestPath.size();
+        String left = longestPath.get((pathSize / 2) - 1);
+        String right = longestPath.get(pathSize / 2);
+        rootPairs = removePair(rootPairs, left, right);
+
+        ArrayList<String> resLeft = new ArrayList<>();
+        ArrayList<String> resRight = new ArrayList<>();
+        Queue<String> queue = new LinkedList<>();
+        queue.add(left);
+        while (!queue.isEmpty()) {
+            String curr = queue.poll();
+            resLeft.add(curr);
+            for (String[] pair : rootPairs) {
+                if ((pair[0].equals(curr) && !resLeft.contains(pair[1])) ||
+                        (pair[1].equals(curr) && !resLeft.contains(pair[0]))) {
+                    String next = pair[0].equals(curr)? pair[1] : pair[0];
+                    queue.offer(next);
+                }
+            }
+        }
+        for (String s : roots) {
+            if (resLeft.contains(s)) continue;
+            resRight.add(s);
+        }
+        return new ArrayList<>(Arrays.asList(resLeft, resRight));
+    }
+
+    public static ArrayList<String> findLongestString(String start, ArrayList<String[]> rootPairs,
+                                                      ArrayList<String> currPath,
+                                                      ArrayList<String> longest) {
+        boolean hasStart = false;
+        for (String[] rootPair : rootPairs) {
+            if (rootPair[0].equals(start) || rootPair[1].equals(start)) {
+                hasStart = true;
+                break;
+            }
+        }
+        if (!hasStart) {
+            if (longest == null || currPath.size() > longest.size()) {
+                longest = new ArrayList<>(currPath);
+            }
+            return longest;
+        }
+        for (String[] rootPair : rootPairs) {
+            if (rootPair[0].equals(start) || rootPair[1].equals(start)) {
+                String next = rootPair[0].equals(start)? rootPair[1] : rootPair[0];
+                currPath.add(next);
+                // remove the edge we just walked
+                ArrayList<String[]> temp = new ArrayList<>(rootPairs);
+                temp = removePair(temp, next, start);
+                // recursion
+                longest = findLongestString(next, temp, currPath, longest);
+                currPath.remove(next);
+            }
+        }
+        return longest;
+    }
+
+    public static ArrayList<String[]> generateRootPairs(ArrayList<String> roots) {
+        ArrayList<String[]> rootPairs = new ArrayList<>();
+        for (String[] pair : pairs) {
+            String left = var2root.get(pair[0]);
+            String right = var2root.get(pair[1]);
+            if (!roots.contains(left) || !roots.contains(right) || containsPair(rootPairs, left, right)) {
+                continue;
+            }
+            rootPairs.add(new String[]{left, right});
+        }
+        return rootPairs;
+    }
+
+    public static boolean containsPair(ArrayList<String[]> list, String left, String right) {
+        for (String[] pair : list) {
+            if ((pair[0].equals(left) && pair[1].equals(right)) ||
+                    (pair[1].equals(left) && pair[0].equals(right))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static ArrayList<String[]> removePair(ArrayList<String[]> list, String left, String right) {
+        if (!containsPair(list, left, right)) {
+            return list;
+        }
+        int i = 0;
+        for (; i < list.size(); i++) {
+            String[] rootPair = list.get(i);
+            if ((rootPair[0].equals(left) && rootPair[1].equals(right)) ||
+                    (rootPair[1].equals(left) && rootPair[0].equals(right))) {
+                break;
+            }
+        }
+        list.remove(i);
+        return list;
+    }
+
+
+    public static String rewrite(ParseTree parseTree, String flag) {
         if (!needRewrite(parseTree)) return "";
         ArrayList<String> root = new ArrayList<>(root2child.keySet());
-        if (flag == 'L') {
-            return left_join(root);
+        String result = "for $tuple in ";
+        if (flag.equals("L")) {
+            result += left_join(root);
+        } else if (flag.equals("B")) {
+            result += bushy_join(root);
         } else {
-            return bushy_join(root);
+            System.out.println("Wrong Argument, should be \"L\" or \"B\"");
+            return null;
         }
+        result += "\n";
+        result += getReturnClause(parseTree.getChild(2));
+        return result;
     }
 
     private static String bushy_join(ArrayList<String> root) {
         if (root.size() <= 2) {
             return left_join(root);
         }
-        ArrayList<String> left = null;
-        ArrayList<String> right = null;
+        ArrayList<ArrayList<String>> devided = findMedium(root);
+        ArrayList<String> left = devided.get(0);
+        ArrayList<String> right = devided.get(1);
+        String bushyJoinLeft = bushy_join(left);
+        String bushyJoinRight = bushy_join(right);
+        String res = " join (" + bushyJoinLeft + ", \n" + bushyJoinRight + "\n";
+        ArrayList<String> leftCond = new ArrayList<>();
+        ArrayList<String> rightCond = new ArrayList<>();
+        // get the pairs in different sides
+        for (int i = 0; i < pairs.size(); ++i) {
+            if (left.contains(var2root.get(pairs.get(i)[0])) && right.contains(var2root.get(pairs.get(i)[1]))) {
+                leftCond.add(pairs.get(i)[0]);
+                rightCond.add(pairs.get(i)[1]);
+            } else if (left.contains(var2root.get(pairs.get(i)[1])) && right.contains(var2root.get(pairs.get(i)[0]))) {
+                leftCond.add(pairs.get(i)[1]);
+                rightCond.add(pairs.get(i)[0]);
+            }
+        }
+        res += printCond(leftCond,rightCond);
+        res += ")";
+        return res;
+    }
 
+    private static String printCond(ArrayList<String> leftCond, ArrayList<String> rightCond) {
+        String res = "[";
+        for(int i = 0; i < leftCond.size();i++) {
+            res += leftCond.get(i);
+            if(i != leftCond.size()-1) {
+                res +=",";
+            }
+        }
+        res +="], [";
+        for(int i = 0; i < rightCond.size();i++) {
+            res += rightCond.get(i);
+            if(i != rightCond.size()-1) {
+                res +=",";
+            }
+        }
+        res += "]  ";
+        return res;
     }
 
     // base case
@@ -224,9 +412,9 @@ public class XQueryOptimize {
             condRight += "]";
             result = result + condLeft + "," + condRight + ")\n";
         }
-        result = "for $tuple in " + result + "\n";
-        // result = result.substring(0, result.length() - 2) + "\n";
-        result += getReturnClause(parseTree.getChild(2));
+//        result = "for $tuple in " + result + "\n";
+//        // result = result.substring(0, result.length() - 2) + "\n";
+//        result += getReturnClause(parseTree.getChild(2));
         return result;
     }
 
@@ -239,10 +427,8 @@ public class XQueryOptimize {
                 nestedFlag = true;
                 return "";
             } else if (nestedFlag) {
-                String rootVar = var2root.get(cur);
-                String tuple = "$tuple";
                 nestedFlag = false;
-                return tuple + '/' + cur + "/*";
+                return "$tuple/" + cur + "/*";
             } else {
                 return cur + " ";
             }
