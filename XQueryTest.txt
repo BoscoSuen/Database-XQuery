@@ -1,23 +1,24 @@
-for $a1 in doc("j_caesar.xml")//ACT,
- $a2 in $a1/TITLE,
- $a3 in $a1/SCENE,
- $a4 in $a3/SPEECH,
- $a5 in $a3/STAGEDIR/text(),
- $a6 in $a4/SPEAKER,
+for $b1 in doc("book.xml")//book,
+    $aj in $b1/author/first/text(),
+    $a1 in $b1/author,
 
- $b1 in doc("j_caesar.xml")//ACT,
- $b2 in $b1//SPEECH,
- $b3 in $b1/TITLE,
+    $b2 in doc("book.xml")//book,
+    $a2 in $b2/author,
 
- $c1 in doc("j_caesar.xml")//ACT,
- $c2 in $c1//SPEAKER,
- $c3 in $c1/TITLE,
+    $b3 in doc("book.xml")//book,
+    $a3 in $b3/author,
 
- $d1 in doc("j_caesar.xml")//ACT,
- $d2 in $d1//TITLE
+    $b4 in doc("book.xml")//book,
+    $a4 in $b4/author,
 
-where $a5 eq "Enter FLAVIUS, MARULLUS, and certain Commoners" and
-   $a6 eq $c2 and $b3 eq $d2 and $a4 eq $b2 and
-   $a1 eq $d1 and $b1 eq $c1
+    $b5 in doc("book.xml")//book,
+    $a5 in $b5/author,
 
-return <triplet> { $a1, $b1, $c1, $d1} </triplet>
+    $b6 in doc("book.xml")//book,
+    $a6 in $b6/author
+
+where $aj eq "W." and
+      $a1 eq $a2 and $a2 eq $a3 and
+      $a3 eq $a6 and $a3 eq $a5 and $a3 eq $a4
+
+return <triplet> {$b1, $b2, $b3, $b4, $b5, $b6} </triplet>

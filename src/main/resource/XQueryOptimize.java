@@ -333,14 +333,14 @@ public class XQueryOptimize {
 
     private static String bushy_join(ArrayList<String> root) {
         if (root.size() <= 2) {
-            return left_join(root);
+            return (left_join(root));
         }
         ArrayList<ArrayList<String>> devided = findMedium(root);
         ArrayList<String> left = devided.get(0);
         ArrayList<String> right = devided.get(1);
         String bushyJoinLeft = bushy_join(left);
         String bushyJoinRight = bushy_join(right);
-        String res = " join (" + bushyJoinLeft + ", \n" + bushyJoinRight + "\n";
+        String res = " join (" + bushyJoinLeft + " \n" + bushyJoinRight + ",\n";
         ArrayList<String> leftCond = new ArrayList<>();
         ArrayList<String> rightCond = new ArrayList<>();
         // get the pairs in different sides
