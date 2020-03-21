@@ -1,0 +1,424 @@
+-------- Rewritten Query ---------
+for $tuple in join ( 
+for $q1 in doc("j_caesar.xml")//ACT, 
+$sa in $q1//SCENE, 
+$spa in $sa//SPEAKER, 
+$spb in $sa//SPEAKER/text(), 
+$spea in $sa//SPEECH, 
+$spec in $sa//SPEECH
+where $spb eq "FLAVIUS"
+return <tuple> {
+	<q1> {$q1} </q1>, 
+	<sa> {$sa} </sa>, 
+	<spa> {$spa} </spa>, 
+	<spb> {$spb} </spb>, 
+	<spea> {$spea} </spea>, 
+	<spec> {$spec} </spec>	}</tuple>
+,
+for $q2 in doc("j_caesar.xml")//ACT, 
+$sb in $q2//SCENE, 
+$spc in $sb//SPEAKER, 
+$spd in $sb//SPEAKER/text(), 
+$speb in $sb//SPEECH, 
+$sped in $sb//SPEECH
+where $spd eq "FLAVIUS"
+return <tuple> {
+	<q2> {$q2} </q2>, 
+	<sb> {$sb} </sb>, 
+	<spc> {$spc} </spc>, 
+	<spd> {$spd} </spd>, 
+	<speb> {$speb} </speb>, 
+	<sped> {$sped} </sped>	}</tuple>
+,
+[sa, spa, spec, spea],[sb, spc, speb, sped])
+
+return < result > { < title > { $tuple/sa/*/ TITLE / text() } </ title > , < speaker > { $tuple/spa/*/ * } </ speaker > } </ result > 
+
+-------- Query Output --------
+<result>
+<title>SCENE I. Rome. A street.</title>
+<speaker>FLAVIUS</speaker>
+</result>
+<result>
+<speaker>FLAVIUS</speaker>
+<title>SCENE I. Rome. A street.</title>
+</result>
+<result>
+<speaker>FLAVIUS</speaker>
+<title>SCENE I. Rome. A street.</title>
+</result>
+<result>
+<speaker>FLAVIUS</speaker>
+<title>SCENE I. Rome. A street.</title>
+</result>
+<result>
+<speaker>FLAVIUS</speaker>
+<title>SCENE I. Rome. A street.</title>
+</result>
+<result>
+<title>SCENE I. Rome. A street.</title>
+<speaker>FLAVIUS</speaker>
+</result>
+<result>
+<title>SCENE I. Rome. A street.</title>
+<speaker>FLAVIUS</speaker>
+</result>
+<result>
+<speaker>FLAVIUS</speaker>
+<title>SCENE I. Rome. A street.</title>
+</result>
+<result>
+<title>SCENE I. Rome. A street.</title>
+<speaker>FLAVIUS</speaker>
+</result>
+<result>
+<speaker>FLAVIUS</speaker>
+<title>SCENE I. Rome. A street.</title>
+</result>
+<result>
+<speaker>FLAVIUS</speaker>
+<title>SCENE I. Rome. A street.</title>
+</result>
+<result>
+<title>SCENE I. Rome. A street.</title>
+<speaker>FLAVIUS</speaker>
+</result>
+<result>
+<title>SCENE I. Rome. A street.</title>
+<speaker>FLAVIUS</speaker>
+</result>
+<result>
+<title>SCENE I. Rome. A street.</title>
+<speaker>FLAVIUS</speaker>
+</result>
+<result>
+<speaker>FLAVIUS</speaker>
+<title>SCENE I. Rome. A street.</title>
+</result>
+<result>
+<speaker>FLAVIUS</speaker>
+<title>SCENE I. Rome. A street.</title>
+</result>
+<result>
+<speaker>MARULLUS</speaker>
+<title>SCENE I. Rome. A street.</title>
+</result>
+<result>
+<title>SCENE I. Rome. A street.</title>
+<speaker>MARULLUS</speaker>
+</result>
+<result>
+<title>SCENE I. Rome. A street.</title>
+<speaker>MARULLUS</speaker>
+</result>
+<result>
+<title>SCENE I. Rome. A street.</title>
+<speaker>MARULLUS</speaker>
+</result>
+<result>
+<speaker>MARULLUS</speaker>
+<title>SCENE I. Rome. A street.</title>
+</result>
+<result>
+<speaker>MARULLUS</speaker>
+<title>SCENE I. Rome. A street.</title>
+</result>
+<result>
+<speaker>MARULLUS</speaker>
+<title>SCENE I. Rome. A street.</title>
+</result>
+<result>
+<speaker>MARULLUS</speaker>
+<title>SCENE I. Rome. A street.</title>
+</result>
+<result>
+<speaker>MARULLUS</speaker>
+<title>SCENE I. Rome. A street.</title>
+</result>
+<result>
+<speaker>MARULLUS</speaker>
+<title>SCENE I. Rome. A street.</title>
+</result>
+<result>
+<title>SCENE I. Rome. A street.</title>
+<speaker>MARULLUS</speaker>
+</result>
+<result>
+<title>SCENE I. Rome. A street.</title>
+<speaker>MARULLUS</speaker>
+</result>
+<result>
+<title>SCENE I. Rome. A street.</title>
+<speaker>MARULLUS</speaker>
+</result>
+<result>
+<title>SCENE I. Rome. A street.</title>
+<speaker>MARULLUS</speaker>
+</result>
+<result>
+<speaker>MARULLUS</speaker>
+<title>SCENE I. Rome. A street.</title>
+</result>
+<result>
+<speaker>MARULLUS</speaker>
+<title>SCENE I. Rome. A street.</title>
+</result>
+<result>
+<title>SCENE I. Rome. A street.</title>
+<speaker>MARULLUS</speaker>
+</result>
+<result>
+<title>SCENE I. Rome. A street.</title>
+<speaker>MARULLUS</speaker>
+</result>
+<result>
+<speaker>MARULLUS</speaker>
+<title>SCENE I. Rome. A street.</title>
+</result>
+<result>
+<title>SCENE I. Rome. A street.</title>
+<speaker>MARULLUS</speaker>
+</result>
+<result>
+<speaker>MARULLUS</speaker>
+<title>SCENE I. Rome. A street.</title>
+</result>
+<result>
+<title>SCENE I. Rome. A street.</title>
+<speaker>MARULLUS</speaker>
+</result>
+<result>
+<title>SCENE I. Rome. A street.</title>
+<speaker>MARULLUS</speaker>
+</result>
+<result>
+<title>SCENE I. Rome. A street.</title>
+<speaker>MARULLUS</speaker>
+</result>
+<result>
+<speaker>MARULLUS</speaker>
+<title>SCENE I. Rome. A street.</title>
+</result>
+<result>
+<speaker>MARULLUS</speaker>
+<title>SCENE I. Rome. A street.</title>
+</result>
+<result>
+<speaker>MARULLUS</speaker>
+<title>SCENE I. Rome. A street.</title>
+</result>
+<result>
+<title>SCENE I. Rome. A street.</title>
+<speaker>MARULLUS</speaker>
+</result>
+<result>
+<title>SCENE I. Rome. A street.</title>
+<speaker>MARULLUS</speaker>
+</result>
+<result>
+<title>SCENE I. Rome. A street.</title>
+<speaker>MARULLUS</speaker>
+</result>
+<result>
+<speaker>MARULLUS</speaker>
+<title>SCENE I. Rome. A street.</title>
+</result>
+<result>
+<title>SCENE I. Rome. A street.</title>
+<speaker>MARULLUS</speaker>
+</result>
+<result>
+<title>SCENE I. Rome. A street.</title>
+<speaker>First Commoner</speaker>
+</result>
+<result>
+<title>SCENE I. Rome. A street.</title>
+<speaker>First Commoner</speaker>
+</result>
+<result>
+<speaker>First Commoner</speaker>
+<title>SCENE I. Rome. A street.</title>
+</result>
+<result>
+<title>SCENE I. Rome. A street.</title>
+<speaker>First Commoner</speaker>
+</result>
+<result>
+<speaker>First Commoner</speaker>
+<title>SCENE I. Rome. A street.</title>
+</result>
+<result>
+<speaker>First Commoner</speaker>
+<title>SCENE I. Rome. A street.</title>
+</result>
+<result>
+<speaker>First Commoner</speaker>
+<title>SCENE I. Rome. A street.</title>
+</result>
+<result>
+<speaker>First Commoner</speaker>
+<title>SCENE I. Rome. A street.</title>
+</result>
+<result>
+<speaker>First Commoner</speaker>
+<title>SCENE I. Rome. A street.</title>
+</result>
+<result>
+<speaker>First Commoner</speaker>
+<title>SCENE I. Rome. A street.</title>
+</result>
+<result>
+<speaker>First Commoner</speaker>
+<title>SCENE I. Rome. A street.</title>
+</result>
+<result>
+<speaker>First Commoner</speaker>
+<title>SCENE I. Rome. A street.</title>
+</result>
+<result>
+<speaker>First Commoner</speaker>
+<title>SCENE I. Rome. A street.</title>
+</result>
+<result>
+<speaker>First Commoner</speaker>
+<title>SCENE I. Rome. A street.</title>
+</result>
+<result>
+<speaker>First Commoner</speaker>
+<title>SCENE I. Rome. A street.</title>
+</result>
+<result>
+<speaker>First Commoner</speaker>
+<title>SCENE I. Rome. A street.</title>
+</result>
+<result>
+<speaker>MARULLUS</speaker>
+<title>SCENE I. Rome. A street.</title>
+</result>
+<result>
+<title>SCENE I. Rome. A street.</title>
+<speaker>MARULLUS</speaker>
+</result>
+<result>
+<title>SCENE I. Rome. A street.</title>
+<speaker>MARULLUS</speaker>
+</result>
+<result>
+<speaker>MARULLUS</speaker>
+<title>SCENE I. Rome. A street.</title>
+</result>
+<result>
+<title>SCENE I. Rome. A street.</title>
+<speaker>MARULLUS</speaker>
+</result>
+<result>
+<title>SCENE I. Rome. A street.</title>
+<speaker>MARULLUS</speaker>
+</result>
+<result>
+<speaker>MARULLUS</speaker>
+<title>SCENE I. Rome. A street.</title>
+</result>
+<result>
+<title>SCENE I. Rome. A street.</title>
+<speaker>MARULLUS</speaker>
+</result>
+<result>
+<speaker>MARULLUS</speaker>
+<title>SCENE I. Rome. A street.</title>
+</result>
+<result>
+<title>SCENE I. Rome. A street.</title>
+<speaker>MARULLUS</speaker>
+</result>
+<result>
+<title>SCENE I. Rome. A street.</title>
+<speaker>MARULLUS</speaker>
+</result>
+<result>
+<title>SCENE I. Rome. A street.</title>
+<speaker>MARULLUS</speaker>
+</result>
+<result>
+<speaker>MARULLUS</speaker>
+<title>SCENE I. Rome. A street.</title>
+</result>
+<result>
+<title>SCENE I. Rome. A street.</title>
+<speaker>MARULLUS</speaker>
+</result>
+<result>
+<speaker>MARULLUS</speaker>
+<title>SCENE I. Rome. A street.</title>
+</result>
+<result>
+<title>SCENE I. Rome. A street.</title>
+<speaker>MARULLUS</speaker>
+</result>
+<result>
+<speaker>MARULLUS</speaker>
+<title>SCENE I. Rome. A street.</title>
+</result>
+<result>
+<speaker>MARULLUS</speaker>
+<title>SCENE I. Rome. A street.</title>
+</result>
+<result>
+<speaker>MARULLUS</speaker>
+<title>SCENE I. Rome. A street.</title>
+</result>
+<result>
+<title>SCENE I. Rome. A street.</title>
+<speaker>MARULLUS</speaker>
+</result>
+<result>
+<title>SCENE I. Rome. A street.</title>
+<speaker>MARULLUS</speaker>
+</result>
+<result>
+<speaker>MARULLUS</speaker>
+<title>SCENE I. Rome. A street.</title>
+</result>
+<result>
+<title>SCENE I. Rome. A street.</title>
+<speaker>MARULLUS</speaker>
+</result>
+<result>
+<title>SCENE I. Rome. A street.</title>
+<speaker>MARULLUS</speaker>
+</result>
+<result>
+<speaker>MARULLUS</speaker>
+<title>SCENE I. Rome. A street.</title>
+</result>
+<result>
+<speaker>MARULLUS</speaker>
+<title>SCENE I. Rome. A street.</title>
+</result>
+<result>
+<title>SCENE I. Rome. A street.</title>
+<speaker>MARULLUS</speaker>
+</result>
+<result>
+<title>SCENE I. Rome. A street.</title>
+<speaker>MARULLUS</speaker>
+</result>
+<result>
+<title>SCENE I. Rome. A street.</title>
+<speaker>MARULLUS</speaker>
+</result>
+<result>
+<speaker>MARULLUS</speaker>
+<title>SCENE I. Rome. A street.</title>
+</result>
+<result>
+<speaker>MARULLUS</speaker>
+<title>SCENE I. Rome. A street.</title>
+</result>
+<result>
+<title>SCENE I. Rome. A street.</title>
+<speaker>MARULLUS</speaker>
+</result>
+
+-------- Query Summary --------
+Number of nodes found: 96
