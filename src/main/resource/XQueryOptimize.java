@@ -195,6 +195,28 @@ public class XQueryOptimize {
     public static ArrayList<ArrayList<String>> findMedium(ArrayList<String> roots) {
         // Construct pair with roots
         ArrayList<String[]> rootPairs = generateRootPairs(roots);
+        ArrayList<String> tempLeft = new ArrayList<>();
+        ArrayList<String> tempRight = new ArrayList<>();
+        Queue<String> q = new LinkedList<>();
+        q.add(roots.get(0));
+        while (!q.isEmpty()) {
+            String curr = q.poll();
+            tempLeft.add(curr);
+            for (String[] pair : rootPairs) {
+                if ((pair[0].equals(curr) && !tempLeft.contains(pair[1])) ||
+                        (pair[1].equals(curr) && !tempLeft.contains(pair[0]))) {
+                    String next = pair[0].equals(curr)? pair[1] : pair[0];
+                    q.offer(next);
+                }
+            }
+        }
+        for (String s : roots) {
+            if (tempLeft.contains(s)) continue;
+            tempRight.add(s);
+        }
+        if (tempRight.size() > 0) {
+            return new ArrayList<>(Arrays.asList(tempLeft, tempRight));
+        }
 
         // Calculate degrees
         HashMap<String, Integer> degrees = new HashMap<>();
@@ -205,10 +227,22 @@ public class XQueryOptimize {
 
         // Find the start node
         String start = new String();
+        int minDegree = Integer.MAX_VALUE;
         for (Map.Entry<String, Integer> d : degrees.entrySet()) {
-            if (d.getValue() != 1) continue;
-            start = d.getKey();
-            break;
+            if (d.getValue() < minDegree) {
+                minDegree = d.getValue();
+                start = d.getKey();
+            }
+        }
+        if (minDegree > 1) {
+            String next = new String();
+            for (String[] pair : rootPairs) {
+                if ((pair[0].equals(start) || pair[1].equals(start))) {
+                    next = pair[0].equals(start)? pair[1] : pair[0];
+                    break;
+                }
+            }
+            rootPairs = removePair(rootPairs, next, start);
         }
 
         // Find the longest path adn divide the graph
@@ -260,6 +294,7 @@ public class XQueryOptimize {
         for (String[] rootPair : rootPairs) {
             if (rootPair[0].equals(start) || rootPair[1].equals(start)) {
                 String next = rootPair[0].equals(start)? rootPair[1] : rootPair[0];
+                if (currPath.contains(next)) continue;
                 currPath.add(next);
                 // remove the edge we just walked
                 ArrayList<String[]> temp = new ArrayList<>(rootPairs);
