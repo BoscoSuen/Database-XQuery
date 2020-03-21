@@ -1,34 +1,49 @@
-for $tuple in join ( 
-for $q1 in doc("j_caesar.xml")//ACT, 
-$sa in $q1//SCENE, 
-$spa in $sa//SPEAKER, 
-$spb in $sa//SPEAKER/text(), 
-$spea in $sa//SPEECH, 
-$spec in $sa//SPEECH
-where $spb eq "FLAVIUS"
+for $tuple in  join ( join (for $b4 in doc("book.xml")//book, 
+$a4 in $b4/author
 return <tuple> {
-	<q1> {$q1} </q1>, 
-	<sa> {$sa} </sa>, 
-	<spa> {$spa} </spa>, 
-	<spb> {$spb} </spb>, 
-	<spea> {$spea} </spea>, 
-	<spec> {$spec} </spec>	}</tuple>
-,
-for $q2 in doc("j_caesar.xml")//ACT, 
-$sb in $q2//SCENE, 
-$spc in $sb//SPEAKER, 
-$spd in $sb//SPEAKER/text(), 
-$speb in $sb//SPEECH, 
-$sped in $sb//SPEECH
-where $spd eq "FLAVIUS"
+	<b4> {$b4} </b4>, 
+	<a4> {$a4} </a4>	}</tuple>
+, 
+ join (for $b5 in doc("book.xml")//book, 
+$a5 in $b5/author
 return <tuple> {
-	<q2> {$q2} </q2>, 
-	<sb> {$sb} </sb>, 
-	<spc> {$spc} </spc>, 
-	<spd> {$spd} </spd>, 
-	<speb> {$speb} </speb>, 
-	<sped> {$sped} </sped>	}</tuple>
+	<b5> {$b5} </b5>, 
+	<a5> {$a5} </a5>	}</tuple>
+, 
+join ( 
+for $b3 in doc("book.xml")//book, 
+$a3 in $b3/author
+return <tuple> {
+	<b3> {$b3} </b3>, 
+	<a3> {$a3} </a3>	}</tuple>
 ,
-[sa, spa, spec, spea],[sb, spc, speb, sped])
-
-return < result > { < title > { $tuple/sa/*/ TITLE / text() } </ title > , < speaker > { $tuple/spa/*/ * } </ speaker > } </ result > 
+for $b6 in doc("book.xml")//book, 
+$a6 in $b6/author
+return <tuple> {
+	<b6> {$b6} </b6>, 
+	<a6> {$a6} </a6>	}</tuple>
+,
+[a3],[a6])
+, 
+[a5], [a3]  ), 
+[a4], [a3]  ), 
+join ( 
+for $b2 in doc("book.xml")//book, 
+$a2 in $b2/author
+return <tuple> {
+	<b2> {$b2} </b2>, 
+	<a2> {$a2} </a2>	}</tuple>
+,
+for $b1 in doc("book.xml")//book, 
+$aj in $b1/author/first/text(), 
+$a1 in $b1/author
+where $aj eq "W."
+return <tuple> {
+	<b1> {$b1} </b1>, 
+	<aj> {$aj} </aj>, 
+	<a1> {$a1} </a1>	}</tuple>
+,
+[a2],[a1])
+, 
+[a3], [a2]  )
+return < triplet > { $tuple/b1/*, $tuple/b2/*, $tuple/b3/*, $tuple/b4/*, $tuple/b5/*, $tuple/b6/*} </ triplet > 

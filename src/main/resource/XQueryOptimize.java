@@ -28,8 +28,8 @@ public class XQueryOptimize {
 
 
     public static void main(String[] args) throws IOException {
-  //      use file reader:
-        File inputFile = new File("XQueryTest.txt");
+        //      use file reader:
+        File inputFile = new File(args[0]);
         if (!inputFile.isFile() || !inputFile.exists()) return;
         FileInputStream fileInputStream = new FileInputStream(inputFile);
         InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream);
@@ -52,7 +52,7 @@ public class XQueryOptimize {
         // optimization
 
 
-        String queryRewritten = rewrite(parseTree,args[0]);
+        String queryRewritten = rewrite(parseTree,args[1].substring(1));
         if (queryRewritten.length() == 0) queryRewritten = inputQuery;
         // rewrite the query and save the query format
         File outputFile = new File("OptimizedQuery.txt");
@@ -260,7 +260,7 @@ public class XQueryOptimize {
 
         // Find the longest path adn divide the graph
         ArrayList<String> longestPath = findLongestString(start, rootPairs, new ArrayList<>(Arrays.asList(start)),
-                                                           new ArrayList<>());
+                new ArrayList<>());
         int pathSize = longestPath.size();
         String left = longestPath.get((pathSize / 2) - 1);
         String right = longestPath.get(pathSize / 2);
@@ -372,7 +372,7 @@ public class XQueryOptimize {
         } else if (flag.equals("B")) {
             result += bushy_join(root);
         } else {
-            System.out.println("Wrong Argument, should be \"L\" or \"B\"");
+            System.out.println("Wrong Join Control Argument, should be \"-L\" or \"-B\"");
             return null;
         }
         result += "\n";
